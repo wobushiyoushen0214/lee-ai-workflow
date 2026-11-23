@@ -20,18 +20,19 @@ from urllib.parse import unquote
 ROOT = pathlib.Path(__file__).resolve().parents[1]
 NOTES_DIR = ROOT / ".agents" / "notes"
 EVIDENCE_DIR = ROOT / "docs" / "ux-evidence"
+EVIDENCE_READMES = ["README.md", "report.md"]
 RELEASES_DIR = ROOT / "docs" / "releases"
 LINK_DOCS = [ROOT / "docs" / "ai-workflow.md", ROOT / "docs" / "workflow.md", ROOT / "AGENTS.md"]
 
 ALLOW_NO_RELEASES = True
 RELEASE_REQUIRED = {"md", "build", "package", "online"}
 RELEASE_OPTIONAL = set()
-DEFAULT_CONFIG = {'version': 1, 'notes_dir': '.agents/notes', 'evidence_dir': 'docs/ux-evidence', 'releases_dir': 'docs/releases', 'allow_no_releases': True, 'release_required': ['md', 'build', 'package', 'online'], 'release_optional': [], 'link_docs': ['AGENTS.md', 'docs/ai-workflow.md', 'docs/workflow.md'], 'link_globs': ['templates/**/*.md', '.agents/skills/**/*.md', 'docs/**/*.md']}
+DEFAULT_CONFIG = {'version': 1, 'notes_dir': '.agents/notes', 'evidence_dir': 'docs/ux-evidence', 'evidence_readmes': ['README.md', 'report.md'], 'releases_dir': 'docs/releases', 'allow_no_releases': True, 'release_required': ['md', 'build', 'package', 'online'], 'release_optional': [], 'link_docs': ['AGENTS.md', 'docs/ai-workflow.md', 'docs/workflow.md'], 'link_globs': ['templates/**/*.md', '.agents/skills/**/*.md', 'docs/**/*.md']}
 
 
 def configure(root, config_path=None):
     """只接受项目内的相对路径；不依赖调用进程所在目录。"""
-    global ROOT, NOTES_DIR, EVIDENCE_DIR, RELEASES_DIR, LINK_DOCS
+    global ROOT, NOTES_DIR, EVIDENCE_DIR, EVIDENCE_READMES, RELEASES_DIR, LINK_DOCS
     global ALLOW_NO_RELEASES, RELEASE_REQUIRED, RELEASE_OPTIONAL
     ROOT = pathlib.Path(root).expanduser().resolve()
     if not ROOT.is_dir():
@@ -64,6 +65,12 @@ def configure(root, config_path=None):
 
     NOTES_DIR = local_path(data["notes_dir"])
     EVIDENCE_DIR = local_path(data["evidence_dir"])
+    entries = data["evidence_readmes"]
+    if not isinstance(entries, list) or not entries or any(
+        not isinstance(name, str) or not re.fullmatch(r"[A-Za-z0-9_.-]+\.md", name) for name in entries
+    ):
+        raise ValueError("evidence_readmes 必须为非空的 Markdown 文件名列表")
+    EVIDENCE_READMES = entries
     RELEASES_DIR = local_path(data["releases_dir"])
     for key in ("link_docs", "link_globs", "release_required", "release_optional"):
         if not isinstance(data[key], list) or any(not isinstance(item, str) or not item for item in data[key]):
@@ -179,8 +186,8 @@ def check_evidence():
     for path in sorted(p for p in EVIDENCE_DIR.iterdir() if p.is_dir()):
         if not date_re.match(path.name):
             add("WARN", path, "证据目录不是 YYYY-MM-DD-<主题> 命名")
-        if not (path / "README.md").is_file():
-            add("WARN", path, "证据目录缺少 README.md（默认精简记录：环境/核对结果/输出链接/未验证）")
+        if not any((path / name).is_file() for name in EVIDENCE_READMES):
+            add("WARN", path, "证据目录缺少 " + " 或 ".join(EVIDENCE_READMES) + "（默认精简记录：环境/核对结果/输出链接/未验证）")
 
 
 def parse_version(name):
@@ -320,7 +327,8 @@ def markdown_link_targets(text):
 def check_links():
     docs = set(LINK_DOCS)
     docs.update(NOTES_DIR.rglob("*.md"))
-    docs.update(EVIDENCE_DIR.rglob("README.md"))
+    for name in EVIDENCE_READMES:
+        docs.update(EVIDENCE_DIR.rglob(name))
     for doc in sorted(docs):
         if not doc.is_file():
             add("WARN", doc, "文档不存在，跳过链接检查")

@@ -16,4 +16,5 @@
 - 修改自检或安装脚本后跑：`python3 -m unittest discover -s scripts -p 'test_*.py' -v`。
 - 不安装、加载或执行 Trellis skill、`.trellis` 工作流、ccpanes skill 或 slash command（browse-sessions、dispatch-todos、fork-session、launch-task、parallel-run、plantocodex、spec、workspace、workspace-migrate）。
 - 单 Agent 为默认；多 Agent 章节供明确授权的协作使用，不自动启动子 Agent。
+- 上游为 [lee-ai-workflow](https://github.com/wobushiyoushen0214/lee-ai-workflow)。已接入项目收到“update 工作流”时按 [升级说明](docs/distribution.md)执行 `python3 scripts/lee-workflow.py update --apply`；保留项目适配、业务约定与记录，冲突先核对，不推送业务项目。留痕使用项目内规则，无需全局技能。
 <!-- momofish-workflow:end -->

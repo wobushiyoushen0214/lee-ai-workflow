@@ -2,6 +2,10 @@
   "version": 1,
   "notes_dir": ".agents/notes",
   "evidence_dir": "docs/ux-evidence",
+  "evidence_readmes": [
+    "README.md",
+    "report.md"
+  ],
   "releases_dir": "docs/releases",
   "allow_no_releases": true,
   "release_required": [

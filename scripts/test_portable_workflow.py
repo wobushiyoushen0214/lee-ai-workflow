@@ -3,6 +3,7 @@ import importlib.util
 import json
 from pathlib import Path
 import subprocess
+import shutil
 import sys
 import tempfile
 import unittest
@@ -26,9 +27,19 @@ class PortableWorkflowTest(unittest.TestCase):
         self.target.mkdir()
         self.workflow = module("check-workflow")
         self.installer = module("install-workflow")
+        # 已接入项目的适配表含业务链接，不能作为独立临时项目的测试前提。
+        self.source = Path(temp.name) / "source"
+        for path in self.installer.files():
+            destination = self.source / path.relative_to(ROOT)
+            destination.parent.mkdir(parents=True, exist_ok=True)
+            shutil.copyfile(path, destination)
+        (self.source / "docs/workflow.md").write_text(
+            "# 测试项目适配\n\n通用规则见 [手册](ai-workflow.md)。\n", encoding="utf-8")
+        (self.source / "workflow.config.json").write_text(
+            json.dumps(self.workflow.DEFAULT_CONFIG), encoding="utf-8")
 
     def install(self):
-        _, changes = self.installer.plan(self.target)
+        _, changes = self.installer.plan(self.target, self.source)
         for path, content in changes:
             path.parent.mkdir(parents=True, exist_ok=True)
             path.write_bytes(content)
@@ -57,7 +68,7 @@ class PortableWorkflowTest(unittest.TestCase):
         path.write_text(original, encoding="utf-8")
         self.install()
         self.assertTrue(path.read_text().startswith(original + "\n\n"))
-        self.assertEqual(self.installer.plan(self.target)[1], [])
+        self.assertEqual(self.installer.plan(self.target, self.source)[1], [])
 
     def test_different_file_conflict_writes_nothing(self):
         path = self.target / "docs/workflow.md"
@@ -65,25 +76,26 @@ class PortableWorkflowTest(unittest.TestCase):
         path.write_text("用户已有工作流")
         before = set(self.target.rglob("*"))
         with self.assertRaisesRegex(ValueError, "未写入任何文件"):
-            self.installer.plan(self.target)
+            self.installer.plan(self.target, self.source)
         self.assertEqual(set(self.target.rglob("*")), before)
         self.assertEqual(path.read_text(), "用户已有工作流")
 
     def test_malformed_agents_marker_is_rejected(self):
         (self.target / "AGENTS.md").write_text(self.installer.START)
         with self.assertRaisesRegex(ValueError, "不完整"):
-            self.installer.plan(self.target)
+            self.installer.plan(self.target, self.source)
 
     def test_symlink_outside_target_is_rejected(self):
         outside = self.target.parent / "outside"
         outside.mkdir()
         (self.target / "docs").symlink_to(outside, target_is_directory=True)
         with self.assertRaisesRegex(ValueError, "符号链接越出"):
-            self.installer.plan(self.target)
+            self.installer.plan(self.target, self.source)
         self.assertEqual(list(outside.iterdir()), [])
 
     def test_preview_cli_does_not_write(self):
-        checked = subprocess.run([sys.executable, str(ROOT / "scripts/install-workflow.py"), str(self.target)],
+        checked = subprocess.run([sys.executable, str(ROOT / "scripts/install-workflow.py"), str(self.target),
+                                  "--source", str(self.source)],
                                  capture_output=True, text=True)
         self.assertEqual(checked.returncode, 0, checked.stderr)
         self.assertEqual(list(self.target.iterdir()), [])
@@ -108,7 +120,8 @@ class PortableWorkflowTest(unittest.TestCase):
         for updates in [{"notes_dir": "../outside"}, {"notes_dir": str(self.target)},
                         {"allow_no_releases": "true"}, {"version": 2},
                         {"release_required": []}, {"unknown": "ignored"},
-                        {"link_globs": ["../*.md"]}]:
+                        {"link_globs": ["../*.md"]}, {"evidence_readmes": []},
+                        {"evidence_readmes": ["../report.md"]}]:
             with self.subTest(updates=updates):
                 self.config(**updates)
                 self.assertEqual(self.run_check("--commits", "0").returncode, 2)

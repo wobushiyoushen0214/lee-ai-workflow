@@ -58,6 +58,19 @@ class WorkflowChecksTest(unittest.TestCase):
         workflow.check_notes()
         self.assertEqual(workflow.results, [])
 
+    def test_report_is_an_evidence_entry_and_its_links_are_checked(self):
+        self.write("docs/ux-evidence/2026-11-23-fixture/report.md", "[输出](missing.txt)")
+        workflow.check_evidence()
+        self.assertEqual(workflow.results, [])
+        workflow.check_links()
+        self.assertEqual(len(self.messages("FAIL")), 1)
+
+    def test_missing_git_never_reads_parent_repository_history(self):
+        with mock.patch.object(workflow.subprocess, "run") as run:
+            workflow.check_commits(20)
+        run.assert_not_called()
+        self.assertTrue(self.messages("WARN"))
+
     def test_rejected_keeps_proposal_without_implementation_validation(self):
         self.note("rejected", "rejected — 收益不足")
         workflow.check_notes()
