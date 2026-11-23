@@ -1,0 +1,26 @@
+一致：momofish-android/AGENTS.md
+一致：momofish-android/docs/ai-workflow.md
+一致：momofish-android/docs/workflow.md
+一致：momofish-android/scripts/check-workflow.py
+一致：momofish-android/scripts/test_check_workflow.py
+一致：momofish-android/scripts/run-ui-audit.py
+一致：momofish-android/scripts/build-emulator-acceptance.py
+一致：momofish-android/.agents/notes/implemented/process/2026-11-04-workflow-consistency.md
+一致：write-notes-like-deepseek/.gitignore
+一致：write-notes-like-deepseek/README.md
+一致：write-notes-like-deepseek/SKILL.md
+一致：write-notes-like-deepseek/package.json
+一致：write-notes-like-deepseek/references/archiving.md
+一致：write-notes-like-deepseek/references/classification.md
+一致：write-notes-like-deepseek/references/note-format.md
+一致：write-notes-like-deepseek/references/prose-checklist.md
+一致：write-notes-like-deepseek/references/simplification-checklist.md
+一致：write-notes-like-deepseek/references/verification.md
+一致：write-notes-like-deepseek/references/when-to-write.md
+一致：write-notes-like-deepseek/scripts/agent-note-tree.ts
+一致：write-notes-like-deepseek/scripts/verify-agent-note-format.ts
+一致：write-notes-like-deepseek/scripts/verify-agent-note-tree.ts
+一致：write-notes-like-deepseek/templates/implemented.md
+一致：write-notes-like-deepseek/templates/proposed.md
+一致：write-notes-like-deepseek/templates/rejected.md
+来源文件 SHA-256 与提取时一致；原版快照逐字节一致。

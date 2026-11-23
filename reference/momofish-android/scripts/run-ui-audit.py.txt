@@ -1,0 +1,69 @@
+#!/usr/bin/env python3
+"""在已连接设备运行单组界面核对，保留原始结果并导出本组截图。"""
+import argparse
+import hashlib
+import json
+from datetime import datetime, timezone
+import pathlib
+import subprocess
+import time
+
+parser = argparse.ArgumentParser(description=__doc__)
+parser.add_argument('--target', required=True, help='测试类名或类名#方法名')
+parser.add_argument('--out', required=True, type=pathlib.Path)
+parser.add_argument('--serial', default='d3ed3c68')
+args = parser.parse_args()
+args.out.mkdir(parents=True, exist_ok=True)
+adb = ['adb', '-s', args.serial]
+pkg = 'com.lizhiwei.momofish.debug'
+def call(*cmd, timeout=20):
+    return subprocess.run(adb + list(cmd), capture_output=True, timeout=timeout)
+
+with (args.out / 'host.txt').open('wb') as host:
+    host.write(('设备：' + args.serial + '\n').encode())
+    host.write(call('shell', 'getprop', 'ro.product.model').stdout)
+    host.write(call('shell', 'getprop', 'ro.build.version.release').stdout)
+    # 即使测试类初始化失败，也不把前一组截图误当成本次证据。
+    call("shell", "run-as", pkg, "sh", "-c", "\"rm -f files/ux-reliability/full-*.png\"")
+    host.write(call('shell', 'am', 'force-stop', pkg).stdout)
+    launch = call('shell', 'am', 'start', '-W', '-n', pkg + '/com.lizhiwei.momofish.MainActivity', '--es', 'tab', 'shelf')
+    host.write(launch.stdout + launch.stderr)
+    with (args.out / 'result.txt').open('wb') as log:
+        proc = subprocess.Popen(adb + ['shell', 'am', 'instrument', '-w', '-r', '-e', 'class', args.target,
+            '-e', 'timeout_msec', '90000', pkg + '.test/androidx.test.runner.AndroidJUnitRunner'], stdout=log, stderr=subprocess.STDOUT)
+        time.sleep(5)
+        status = call('shell', 'dumpsys', 'activity', 'activities').stdout.decode()
+        resumed = [line for line in status.splitlines() if 'topResumedActivity' in line or 'mResumedActivity' in line]
+        if proc.poll() is None and not any('androidx.activity.ComponentActivity' in line for line in resumed):
+            launched = call('shell', 'am', 'start', '-W', '-a', 'android.intent.action.MAIN', '-c',
+                'android.intent.category.LAUNCHER', '-f', '0x10008000', '-n', pkg + '/androidx.activity.ComponentActivity')
+            host.write(launched.stdout + launched.stderr)
+        else:
+            host.write('测试已在前台或已结束，无需重复启动。\n'.encode())
+        print('界面宿主已启动，等待本组断言与截图', flush=True)
+        try:
+            proc.wait(timeout=100)
+        except subprocess.TimeoutExpired:
+            call('shell', 'am', 'force-stop', pkg)
+            proc.terminate()
+            proc.wait(timeout=5)
+            log.write('\n宿主超时，已停止，不计为通过。\n'.encode())
+
+listing = call('shell', 'run-as', pkg, 'ls', 'files/ux-reliability').stdout.decode().splitlines()
+count = 0
+for name in listing:
+    if name.startswith('full-') and name.endswith('.png'):
+        image = call('exec-out', 'run-as', pkg, 'cat', 'files/ux-reliability/' + name)
+        if image.stdout.startswith(b'\x89PNG'):
+            (args.out / name.removeprefix('full-')).write_bytes(image.stdout)
+            count += 1
+result = (args.out / 'result.txt').read_text()
+apk = pathlib.Path('app/build/outputs/apk/debug/app-debug.apk')
+(args.out / 'run.json').write_text(json.dumps({
+    'serial': args.serial, 'target': args.target, 'capturedAt': datetime.now(timezone.utc).isoformat(),
+    'apkSha256': hashlib.sha256(apk.read_bytes()).hexdigest() if apk.exists() else None,
+    'passed': 'OK (' in result, 'screenshots': count,
+}, ensure_ascii=False, indent=2) + '\n')
+print('截图：', count, '结果：', '通过' if 'OK (' in result else '未通过', flush=True)
+print('\n'.join(line for line in result.splitlines() if line.startswith(('Time:', 'OK ('))) if 'OK (' in result else result[-4500:], flush=True)
+raise SystemExit(0 if 'OK (' in result else 1)

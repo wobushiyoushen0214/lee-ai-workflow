@@ -1,0 +1,110 @@
+[
+  {
+    "source": "momofish-android/AGENTS.md",
+    "snapshot": "reference/momofish-android/AGENTS.md.txt",
+    "sha256": "b1c3adf92c2a892aa1c39a23d77b02fba17de6f333234625cb228317bf70d17f"
+  },
+  {
+    "source": "momofish-android/docs/ai-workflow.md",
+    "snapshot": "reference/momofish-android/docs/ai-workflow.md.txt",
+    "sha256": "de576d140cde199591f61453cbe5d595f50e9fa264aa0ad3b2118700393ed0a4"
+  },
+  {
+    "source": "momofish-android/docs/workflow.md",
+    "snapshot": "reference/momofish-android/docs/workflow.md.txt",
+    "sha256": "bbe7b13d23a17b8f604cc807573c58e803652b260c605a795cea9b11df17dc8d"
+  },
+  {
+    "source": "momofish-android/scripts/check-workflow.py",
+    "snapshot": "reference/momofish-android/scripts/check-workflow.py.txt",
+    "sha256": "2ea1407dcaaa7444e720e609b1d449d8c8abb3266aa19e8d4d0fcd6e8751beba"
+  },
+  {
+    "source": "momofish-android/scripts/test_check_workflow.py",
+    "snapshot": "reference/momofish-android/scripts/test_check_workflow.py.txt",
+    "sha256": "175ca23d863d5eec33734ac7c4e5477d93750c6275018f9a7ea090b852d2472b"
+  },
+  {
+    "source": "momofish-android/scripts/run-ui-audit.py",
+    "snapshot": "reference/momofish-android/scripts/run-ui-audit.py.txt",
+    "sha256": "66b54e407878aac1873a555f39b77754089a5d0f3ba03394fd1265c1e5b6477e"
+  },
+  {
+    "source": "momofish-android/scripts/build-emulator-acceptance.py",
+    "snapshot": "reference/momofish-android/scripts/build-emulator-acceptance.py.txt",
+    "sha256": "585a00dbc06a15c2ac3f2e042e150d3903ba7cbcac43f04abdef740c630ca05f"
+  },
+  {
+    "source": "momofish-android/.agents/notes/implemented/process/2026-11-04-workflow-consistency.md",
+    "snapshot": "reference/momofish-android/.agents/notes/implemented/process/2026-11-04-workflow-consistency.md.txt",
+    "sha256": "4a308894b3fce53363a7ad8cd91417549c01547fd99cf28130d993e1ad99948d"
+  },
+  {
+    "source": "write-notes-like-deepseek/.gitignore",
+    "sha256": "9c06abdee6960edd60e955c1916afba661542466f9bc842e7bc8ddc1cf8e71d7"
+  },
+  {
+    "source": "write-notes-like-deepseek/README.md",
+    "sha256": "906fae24660ae7c52849c4d67331c70cff168292b60a71ea4c189ff9db51992d"
+  },
+  {
+    "source": "write-notes-like-deepseek/SKILL.md",
+    "sha256": "f347f3cb09ce942a2372080ead471017ac372be371053453ad58d6f6777d6b6d"
+  },
+  {
+    "source": "write-notes-like-deepseek/package.json",
+    "sha256": "b12952a40003979028feb309f2d33269317382955b58e92694249993e123ee72"
+  },
+  {
+    "source": "write-notes-like-deepseek/references/archiving.md",
+    "sha256": "5e45e51cab72b37a9184dc3dfdbffcaee3ca25e4cd2ba6d0c02dfd41d7e0aaf7"
+  },
+  {
+    "source": "write-notes-like-deepseek/references/classification.md",
+    "sha256": "048d68e18d6a6cf654fed84f942dd4ea09d1b8ddfeb6b3688360a9c012e73a57"
+  },
+  {
+    "source": "write-notes-like-deepseek/references/note-format.md",
+    "sha256": "9162f23a17ae52d3527f97b1d69a7585e59dbb7f1cc398bec0f3298e44ec4c6c"
+  },
+  {
+    "source": "write-notes-like-deepseek/references/prose-checklist.md",
+    "sha256": "ac4b4a93d16bf14145552110f26fe7b9684002fd6f297805050947de5113df5d"
+  },
+  {
+    "source": "write-notes-like-deepseek/references/simplification-checklist.md",
+    "sha256": "a0a351447342e245b21c7cee2f83126643f02d40340e8ecd06898e71e31f269b"
+  },
+  {
+    "source": "write-notes-like-deepseek/references/verification.md",
+    "sha256": "d9f70f6ccedb29423933000a72a3660e6c1dc0509157f60d813ae60d3d3a74ea"
+  },
+  {
+    "source": "write-notes-like-deepseek/references/when-to-write.md",
+    "sha256": "b4f5751b83f753398b089935ad9a3ab352217d4ffafe30d8f9458817d38a76ee"
+  },
+  {
+    "source": "write-notes-like-deepseek/scripts/agent-note-tree.ts",
+    "sha256": "62d864e477d7fb41458e3b1694de053e089b26f6c2e40b66841aa52a67f4ce08"
+  },
+  {
+    "source": "write-notes-like-deepseek/scripts/verify-agent-note-format.ts",
+    "sha256": "e785a2e0fe22704fc1d88d65139456469a45565928729e783ef3a58ed1df3122"
+  },
+  {
+    "source": "write-notes-like-deepseek/scripts/verify-agent-note-tree.ts",
+    "sha256": "d4f2f3a3d14b5d589baf3ef544a4f33c6ffc33566dcc39f8b23ae4182c6c8a00"
+  },
+  {
+    "source": "write-notes-like-deepseek/templates/implemented.md",
+    "sha256": "a40707c4d9d85fd249aa4ca92aa52c0307eacba628859b2d1ca3c4cebb49033e"
+  },
+  {
+    "source": "write-notes-like-deepseek/templates/proposed.md",
+    "sha256": "1d067e0bf63b315930641d660521bc7a541c6feecfaf9fea6c5945f81bc22fc4"
+  },
+  {
+    "source": "write-notes-like-deepseek/templates/rejected.md",
+    "sha256": "2644f5a46bc1c72f569bfaf2c71e5a7c9b6bc70e328d890b5036e1ab233d31c8"
+  }
+]

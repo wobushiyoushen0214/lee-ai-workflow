@@ -1,0 +1,21 @@
+首次定向测试工具输出摘录（2026-11-11）：
+命令：python3 -m unittest discover -s scripts -p 'test_*.py' -v
+Ran 33 tests in 1.583s
+FAILED (failures=3)
+
+三个失败用例：
+test_all_note_templates_match_their_lifecycle
+test_custom_directories_and_release_profile
+test_install_and_strict_check_from_another_directory
+
+各用例中的实际自检输出：
+== 工作流自检 ==
+FAIL 5 · WARN 0
+[FAIL] docs/ai-workflow.md: 断链：../reference/README.md
+[FAIL] docs/workflow.md: 断链：../reference/README.md
+[FAIL] templates/AGENTS-entry.md: 断链：.agents/skills/write-notes-like-deepseek/SKILL.md
+[FAIL] templates/AGENTS-entry.md: 断链：docs/ai-workflow.md
+[FAIL] templates/AGENTS-entry.md: 断链：docs/workflow.md
+
+这是首次工具返回的失败输出摘录，不是完整日志；不计通过。
+修复：接入包包含完整 reference；待追加 AGENTS 的根目录入口作为 .txt 模板，避免按模板所在目录解析根目录链接。

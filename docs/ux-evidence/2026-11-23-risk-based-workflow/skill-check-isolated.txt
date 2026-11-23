@@ -1,0 +1,14 @@
+仅用于外部技能校验器的临时库：PyYAML==6.0.3；运行结束后自动清理。
+
+安装原始输出：
+Collecting PyYAML==6.0.3
+  Downloading pyyaml-6.0.3-cp314-cp314-macosx_11_0_arm64.whl.metadata (2.4 kB)
+Downloading pyyaml-6.0.3-cp314-cp314-macosx_11_0_arm64.whl (173 kB)
+Installing collected packages: PyYAML
+Successfully installed PyYAML-6.0.3
+
+校验器原始输出：
+Skill is valid!
+
+退出码：0
+临时依赖目录已清理；项目与全局 Python 依赖未修改。

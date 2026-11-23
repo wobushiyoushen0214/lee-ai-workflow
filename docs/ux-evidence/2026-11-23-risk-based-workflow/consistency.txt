@@ -1,0 +1,11 @@
+根 AGENTS 的唯一工作流块与接入模板完全一致。
+修改前备份清单：/var/folders/yl/rvbzwc5x0sd_f5h3j98b_np00000gn/T/momofish-workflow-before-vo3yoqbe/baseline-manifest.json
+历史保护：18 个文件的 SHA-256 与修改前一致（reference、旧验证输出、旧 Note）。
+21 项检查器回归与技能入口元数据校验复用已有成功输出；受检脚本和 SKILL.md 未在相应成功记录后改变。
+定向规则审阅：入口、手册 §4/§8/§9/§14–§20 与附录、适配示例、模板、技能及相关 references 采用一致的风险/停止/授权/证据边界。
+补齐遗漏：修 bug 示例按 §9 记录；技能目录先 proposed，implemented 表示已落地，被否决的 proposed 转 rejected。
+
+受检文件 SHA-256（用于界定复用范围）：
+6e9c19b7b3fb34872a927148cae5099ba2a39187eeae1c38ec106bfd99a00fdf  scripts/check-workflow.py
+175ca23d863d5eec33734ac7c4e5477d93750c6275018f9a7ea090b852d2472b  scripts/test_check_workflow.py
+fd34411ed70ac2858c39f361220ea71aa7c0ac3e3aacf08a0d52b1176c90de4f  .agents/skills/write-notes-like-deepseek/SKILL.md

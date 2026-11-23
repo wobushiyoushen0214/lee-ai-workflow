@@ -1,0 +1,7 @@
+命令：python3 /Users/lizhiwei/.codex/skills/.system/skill-creator/scripts/quick_validate.py .agents/skills/write-notes-like-deepseek
+Traceback (most recent call last):
+  File "/Users/lizhiwei/.codex/skills/.system/skill-creator/scripts/quick_validate.py", line 10, in <module>
+    import yaml
+ModuleNotFoundError: No module named 'yaml'
+
+退出码：1

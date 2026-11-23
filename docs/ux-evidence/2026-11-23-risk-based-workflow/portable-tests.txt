@@ -1,0 +1,21 @@
+命令：python3 -m unittest discover -s scripts -p 'test_portable_workflow.py' -v
+复验范围：接入文档后续修正影响的安装、模板、配置与冲突保护；21 项检查器回归复用 tests.txt。
+test_all_note_templates_match_their_lifecycle (test_portable_workflow.PortableWorkflowTest.test_all_note_templates_match_their_lifecycle) ... ok
+test_custom_directories_and_release_profile (test_portable_workflow.PortableWorkflowTest.test_custom_directories_and_release_profile) ... ok
+test_different_file_conflict_writes_nothing (test_portable_workflow.PortableWorkflowTest.test_different_file_conflict_writes_nothing) ... ok
+test_existing_agents_bytes_are_preserved_and_repeat_is_noop (test_portable_workflow.PortableWorkflowTest.test_existing_agents_bytes_are_preserved_and_repeat_is_noop) ... ok
+test_install_and_strict_check_from_another_directory (test_portable_workflow.PortableWorkflowTest.test_install_and_strict_check_from_another_directory) ... ok
+test_invalid_config_and_negative_commits_return_two (test_portable_workflow.PortableWorkflowTest.test_invalid_config_and_negative_commits_return_two) ... ok
+test_invalid_note_class_and_implemented_proposal_fail (test_portable_workflow.PortableWorkflowTest.test_invalid_note_class_and_implemented_proposal_fail) ... ok
+test_malformed_agents_marker_is_rejected (test_portable_workflow.PortableWorkflowTest.test_malformed_agents_marker_is_rejected) ... ok
+test_preview_cli_does_not_write (test_portable_workflow.PortableWorkflowTest.test_preview_cli_does_not_write) ... ok
+test_symlink_outside_target_is_rejected (test_portable_workflow.PortableWorkflowTest.test_symlink_outside_target_is_rejected) ... ok
+test_unreleased_project_policy (test_portable_workflow.PortableWorkflowTest.test_unreleased_project_policy) ... ok
+test_zero_commits_never_invokes_git (test_portable_workflow.PortableWorkflowTest.test_zero_commits_never_invokes_git) ... ok
+
+----------------------------------------------------------------------
+Ran 12 tests in 1.399s
+
+OK
+
+退出码：0

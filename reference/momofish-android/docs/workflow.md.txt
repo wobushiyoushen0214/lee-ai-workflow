@@ -1,0 +1,634 @@
+# momoのfish 安卓版 · 工作流
+
+> 本文描述的是**仓库当前实际在做的工作方式**（基线：2026-10-30，HEAD `ab3b01d`，1.0.12），
+> 不是理想化规范。硬约定以 [AGENTS.md](../AGENTS.md) 为准；本文负责把「起始 → 开发 → 修改 → 优化 →
+> 测试 → 验证 → 发布」串成一条可照做的链路，并标注哪些环节还没自动化。
+
+> 2026-10-30 提交更新：红果 SDK、JSON 书单与自动选源、静默预下载分别进入
+> `93df2bb`、`e3efd8a`、`41e12af`，随后随 [1.0.13 正式发布](releases/1.0.13.md)。第 1 节的 Juku 命令和前置描述属于早期历史，
+> 当前构建以 README 的 openhongguo AAR 流程为准；分组与证据见[本次提交记录](../.agents/notes/implemented/process/2026-10-30-commit-completed-work.md)。
+
+> 2026-11-01 更新：短剧续看／选集、阅读设置分类与等宽预设、书架及换源样式已随 [1.0.16](releases/1.0.16.md) 发布。功能提交 `919a2c0`，构建源码 `8f6ced0`；原始验证与已知限制见发布记录。
+
+> 2026-11-03 更新：书架同排状态测量与基线对齐、紧凑续读卡片、听书设置去重已随[1.0.21](releases/1.0.21.md)发布；界面提交d568647，构建源码e2cd21a，两渠道完整下载核对一致。真机升级与实网播放未验证。
+
+> 2026-11-03 更新：书架统一滚动、分类吸顶、单行续读、书目缓存状态与Toast反馈已随[1.0.20](releases/1.0.20.md)发布；书架提交78e6cb1、构建源码836ba47，更新站与GitHub完整下载核对一致，真机升级未核对。
+
+> 2026-11-03 更新：我的页温暖阅读摘要、四宫格入口、成组设置与 8dp 圆角已随 [1.0.19](releases/1.0.19.md) 发布；界面提交 `4ba4c91`、构建源码 `6ec8b6c`，更新站与 GitHub 完整下载核对一致。正式包真机升级与实网业务未核对，详见发布记录。
+
+> 2026-11-02 更新：内容优先界面、文字 tab、发现网格、书架常显搜索与更多菜单，以及分组完成键焦点修复已随 [1.0.18](releases/1.0.18.md) 发布。界面提交 `ddc3240`，构建源码 `7efa2b4`；更新站与GitHub完整下载核对一致，业务范围和未验证项见发布记录。
+
+> 2026-11-06 更新：已随[1.0.23](releases/1.0.23.md)发布导航动效减重、推荐转场后加载、滚动收起底栏与我的参考布局；功能提交035800f，构建源码5d52d2f，两渠道完整下载、正式签名与源码核对一致。最终真机覆盖升级与整页实网切换帧耗时未验证。
+
+> 2026-11-05 更新：已随[1.0.22](releases/1.0.22.md)发布悬浮导航、频道动效、纸面与设置优化；工作流提交c15e817，界面提交1db2e69，构建源码bcedcc4，两渠道完整下载及正式签名核对一致。真机覆盖升级与完整实网业务未验证。
+
+> 2026-11-08 更新：阅读底栏同色与直角、下载中心设置位置优化已随 [1.0.27](releases/1.0.27.md) 发布；修复提交59dc1dc，构建源码8fba140。54个不同界面用例通过，更新站与GitHub完整下载及正式签名核对一致；真机升级与实网业务未新增验证。
+
+> 2026-11-09 更新：触击反馈、紧凑阅读设置、完整背景色块及常规弹窗对齐已随[1.0.28](releases/1.0.28.md)发布；修复提交4482833，构建源码72d0d7b。两渠道完整APK逐字节一致，身份、签名、版号与构建记录核对通过；真机正式版升级和实网业务未新增验证。
+
+## 0. 先看哪份文档
+
+2026-11-04 工作流修复：命令、Note 状态和模板统一到 [AI 执行手册 v1.1](ai-workflow.md)；自检覆盖 Note 与嵌套证据 README 的本地链接，S 级纯视觉证据可用精简模板。下面的历史数量与开发事实保留，执行采用当前手册和 AGENTS。
+
+| 文档 | 管什么 | 什么时候改 |
+|---|---|---|
+| [README.md](../README.md) | 功能全景、模块地图、构建、内置书源、自检、踩过的坑 | 功能/构造/命令变化时 |
+| [AGENTS.md](../AGENTS.md) | 硬约定：提交信息、中文注释、编译门槛、「别跑没用的测试」 | 约定变化时 |
+| [design.md](../design.md) | 当前设计方案索引（v3），指向 designed.md | 设计版本切换时 |
+| [designed.md](../designed.md) | 全界面 UI/UX 重设计规范 v3（77 张设计图的唯一方案源） | 设计提案评审/变更时 |
+| [.agents/notes/](../.agents/notes/) | 决策记录：为什么这么改、考虑过什么、怎么验证的 | 每次非平凡改动 |
+| [docs/ux-evidence/](ux-evidence/) | 界面核对证据：截图、原始测试输出、设备与构建信息 | 每轮界面验证 |
+| [docs/releases/](releases/) | 发版记录与线上核对数据 | 每次发版 |
+| [vercel/update/README.md](../vercel/update/README.md) | 更新站接口、发布脚本、域名注意事项 | 发布方式变化时 |
+| [docs/ai-workflow.md](ai-workflow.md) | **AI 完整执行手册**：角色/状态机/门禁/异常路径/多 Agent/模板/自检 | 流程规则变化时 |
+| `output/`（gitignore） | 本地安装包、设计图、动效帧等产物 | 不进 git |
+
+经验顺序：**改代码前**读 README 的模块地图 + AGENTS；**改界面前**读 designed.md 对应编号；
+**查历史决策**搜 `.agents/notes`；**发版前**读 vercel README + 最近一版 `docs/releases/*.md`。
+
+---
+
+## 1. 起始：从 macOS 版移植到第一个可运行包
+
+### 1.1 项目定位与取舍
+
+- 来源：macOS 版 momoのfish（`../qingdeng`，SwiftUI）的安卓移植，**Kotlin + Compose**，
+  自用为主，不打算上架（README 开头）。
+- 第一个提交是 2026-10-15 `cd392b6 移植：macOS 版 momoのfish 的安卓实现（Kotlin + Compose）`
+  （103 个文件 / +18,836 行，一次性带入全模块骨架）；到 10-30 的 1.0.12，15 天共 80 个提交。
+- 版本从起步的 0.1.0（versionCode 1）到 10-22 拉直为正式版 1.0.0，之后 8 天连发 12 个版本到 1.0.12。
+- 砍掉的东西：mac 版依赖局域网 `FanqieCore` 的番茄在线源/榜单整块去掉，改为
+  「跨书源搜索 + 书源管理 + 内置社区书源」；短剧/漫剧的 Go 服务端以二进制内置进 apk。
+- 保留并重做的：Legado 书源规则引擎、TXT/EPUB 导入、三模式阅读器、听书、漫画竖读、
+  整本缓存与导出。
+
+### 1.2 起步顺序（10-15 ~ 10-16）
+
+1. 建工程：Kotlin + Compose + Room + OkHttp + Coil + media3，`compileSdk 36 / minSdk 26 / targetSdk 35`。
+2. 先按 mac 版起五个 tab：书架 / 书城 / 听书 / 短剧 / 我的；10-16 `e51d3db` 去掉独立阅读 tab，
+   收敛成四个一级入口（v3 重设计后命名「书架 / 发现 / 短剧 / 我的」；读和听都从书架进）。
+3. 按设计规范整体重做界面（10-16 `da011aa 界面：按设计规范整体重做（令牌层 / 组件四态 / 五个 Tab）`），
+   设计依据是 [docs/design-system-v2.md](design-system-v2.md)。
+4. 用真实资产验证主链路：内置社区书源首次启动灌库（`dafc933`）、短剧库二进制能起进程出推荐。
+5. 用「真实参考图 + 截图」迭代界面，而不是只凭代码想象（书架宫格、阅读器、短剧页都是照参考图重做的）。
+
+### 1.3 环境前置与最小可跑
+
+```bash
+# 前置：JDK 17、Android SDK（compileSdk 36）、NDK（只编短剧库用）、Go 1.24+
+echo "sdk.dir=$HOME/Library/Android/sdk" > local.properties   # 该文件 gitignore
+
+bash Tools/build-juku-android.sh     # 可选：把短剧库编成 libjuku.so（1.0.12 基线；正迁移中，见 §9）
+./gradlew :app:assembleDebug
+```
+
+**不做 juku 那一步也能编过**，短剧页会显示「内置的短剧库缺失」，其余功能不受影响。
+签名是自用钥匙 [keystore/momofish.jks](../keystore/momofish.jks)（已入库，release 构建直接使用），
+这是后续「应用内覆盖升级」能成立的前提。
+
+### 1.4 起始阶段就踩定的硬约束
+
+| 约束 | 原因 | 证据 |
+|---|---|---|
+| 只打 `arm64-v8a` | 内置短剧库只编了这一份 | `app/build.gradle.kts` 的 `abiFilters` |
+| 短剧库必须 cgo + NDK clang | 纯 Go 的 DNS 读不到 `/etc/resolv.conf`，联网全失败 | `Tools/build-juku-android.sh` 注释（1.0.12 基线） |
+| 二进制要叫 `libjuku.so` 并开 `useLegacyPackaging` | Android 10 起私有目录禁止 exec，只能从 `nativeLibraryDir` 起 | README「编短剧库的两个坑」 |
+| 书源 assets 存 `.gz`、运行时读明文名 | aapt 打包会自动解 gz 去扩展名 | README 内置书源一节 |
+
+### 1.5 阶段速览（据 git 历史，80 个提交）
+
+| 阶段 | 日期 | 提交 | 主题 | 代表提交 |
+|---|---|---|---|---|
+| A 移植起步 | 10-15 | 3 | 整体移植 + 短剧库接入 | `cd392b6` |
+| B 规范与内置资产 | 10-16 | 8 | 设计规范 v2、提交约定、内置书源探针 | `da011aa` `9ad3800` `dafc933` |
+| C 界面与阅读器 | 10-19~20 | 13 | 照参考图重做各页、三模式阅读器、暗黑、按位置缓存 | `d2647b9` `e497383` `9da5f9e` |
+| D 书源引擎与正式版 | 10-22~24 | 40 | Rhino/Legado 规则、Venera、更新站、1.0.0~1.0.4 | `c3d0d24` `6838f57` `0bbd413` |
+| E UIUX v3 重设计 | 10-26 | 3 | designed.md v3、77 张设计图、实现起步；1.0.5/1.0.6 | `2e7c66c` `3ea697a` |
+| F 验收与 1.0.7/1.0.8 | 10-27~28 | 3 | 10-27 全天工作未提交，10-28 一次性收口并发布 | `c7c51af` `3bf704c` |
+| G 品牌/主题/体验 | 10-29 | 8 | 小鱼加载与启动动画、五套配色、1.0.9~1.0.11 | `8ec62b3` `4465006` `7513cd9` |
+| H 1.0.12 收尾 | 10-30 | 2 | 启动屏/搜索/下载抽屉修复与发布 | `da36919` `ab3b01d` |
+
+阶段 F 留下一条重要经验：**允许工作区堆一两天，收口时一次性提交「代码 + Agent Note + 截图证据」**——
+`c7c51af` 一次提交 1,300 个文件（其中 1,116 个是 `docs/ux-evidence` 证据），10-27 当天 0 提交。
+
+---
+
+## 2. 开发：一轮改动的标准循环
+
+### 2.1 需求从哪来
+
+1. **用户直接要求**（聊天里的功能点、验收反馈、截图批注）——优先级最高，与设计图冲突时以用户为准
+   （例：书架状态标签按真机反馈改成 14sp、等宽底色）。
+2. **设计稿编号**（M01 组件母版 / P01–P30 业务页 / B01–B24 浮层组件 / S01–S14 状态 / D01–D08 深色），
+   一一对应 [designed.md](../designed.md)。
+3. **真机/模拟器截图发现**的问题（溢出、裁切、遮挡、大字号换行）。
+4. **自检/探针失败**（`SelfCheckTest`、`VeneraProbeTest`、导出用例）。
+
+### 2.2 先写 Agent Note 定方案（非平凡改动）
+
+`.agents/notes/` 是项目的决策账本，当前 46 篇（2026-10-30 统计）：
+
+| 状态 / 分类 | 数量 | 用途 |
+|---|---|---|
+| `proposed/feature` | 2 | 方案未定的提案（含验收标准与风险） |
+| `proposed/architecture` | 1 | 架构级替换提案（短剧核心迁移） |
+| `implemented/feature` | 9 | 已落地的新功能 |
+| `implemented/bug-fix` | 18 | 缺陷根因与修复 |
+| `implemented/simplification` | 5 | 主动做减法（删冗余 UI） |
+| `implemented/process` | 8 | 发版、生图等流程记录 |
+| `implemented/testing` | 2 | 验证轮次记录 |
+| `archived/bug-fix` | 1 | 被后续方案取代 |
+
+- 命名：`YYYY-MM-DD-主题.md`；标题后空一行，再写 `Status: proposed / implemented`。
+  归档保留 `Status: implemented`、加 `Archived: YYYY-MM-DD` 并移到 `archived/<分类>/`；
+  否决提案移到 `rejected/<分类>/`，使用 `Status: rejected — 原因`，保留提案形态。
+- 模板（从 46 篇归纳，基本固定五节）：
+  `Problem → Decision(或 Proposal) → Alternatives considered → Validation(或 Verification) → Consequences`；
+  proposed 阶段用 `Proposal / Acceptance criteria / Risks`，并在评审后补「当前评审交付」。
+  归档版把 `Validation` 写成 `Verification` 也可以——关键是**留下验证了什么、没验证什么**。
+  当前模板固化在 `docs/ai-workflow.md` §17.2，结构和状态由 `scripts/check-workflow.py` 校验；接手时采用仓库模板。
+- 什么时候写：涉及交互/数据契约/取舍/发版的决定都写；纯视觉微调写成一条短 note 也可，
+  但「一次性临时改动」不写（AGENTS.md 也不给它补测试）。
+- 与代码的关系：**note 状态跟实现进度走，不必等提交**。例如
+  [2026-10-30-json-booklist-import.md](../.agents/notes/implemented/feature/2026-10-30-json-booklist-import.md)
+  已从 `proposed` 移到 `implemented/feature/`，对应代码当时还在工作区未提交；
+  反过来，proposed note 也可以先于任何代码存在。发版计划同样走这条路（1.0.7/1.0.8/1.0.10 的
+  process 笔记先以 proposed 提交，上线后才改 implemented）。
+- 移动方式是**删除旧文件 + 新增新文件**（git 历史里没有 rename 记录），状态行与
+  `## Proposal → ## Decision` 要同步改；归档则移到 `archived/<分类>/`、保留 `Status: implemented`、
+  加一行 `Archived: YYYY-MM-DD` 并**修好所有入链**。历史引用维护追加说明，原验证事实保留。
+
+### 2.3 设计先行（界面改动）
+
+- 设计走「先评审、后生成、再实现」：[design.md](../design.md) 只做索引，
+  [designed.md](../designed.md) 是唯一方案源；v3 全量 77 张设计图（M01 母版 + P 页 30 + B 浮层 24 +
+  S 状态 14 + D 深色 8）。**设计图本身不进 git**（在 gitignore 的 `output/uiux-v3/`），
+  仓库里留的是规范文字；图库 `gallery.html`、逐页修正 `qa/pending-revisions.md` 只在本机工作区。
+- 设计令牌落到代码：纸白 + 墨绿、24/20/18/16/14/12 字阶、16 卡片圆角、10 筛选圆角、24 浮层圆角；
+  共享组件统一「空 / 加载 / 失败 / 有内容」四态。
+- 实现按页面编号推进，每页用真实组件 + 隔离数据截图核对；设计图不能证明交互，
+  可点的状态要另加回调断言。
+
+### 2.4 编码约定
+
+- 注释、文档一律中文；新能力优先复用既有的 `OnlineSource` / `LibraryRepository` / `ChapterLoader` 契约。
+- 模块边界：`ui → data → core`；`source/legado`、`source/venera`、`playlet`、`tts` 各自独立；
+  详见 README「模块地图」。
+- 不轻易引第三方库：EPUB 导出是手写 zip，分页是按行累加自己算的，短剧库是内置二进制。
+- Room 改表必须写迁移，schema 由 KSP 输出到 `app/schemas/` 并作为 androidTest 资产。
+
+### 2.5 编译门槛
+
+```bash
+./gradlew :app:compileDebugKotlin            # 改完 Kotlin 的最低门槛
+./gradlew :app:compileDebugKotlin :app:assembleRelease --console=plain   # 发版构建
+```
+
+**编译通过只说编译通过**（AGENTS.md）：不等于验证通过，别在总结里包装。
+
+### 2.6 提交：Conventional Commits，一行标题
+
+- 格式 `<type>: <说明>`，冒号后一个半角空格，说明中英文皆可，结尾不加句号，标题 ≤ 72 字符；
+  需要展开时空一行，正文用 `-` 列点。类型表见 AGENTS.md（feat/fix/refactor/perf/docs/style/test/build/chore）。
+- 配置了 `git config commit.template .gitmessage`，提交时会带格式提示。
+- 实际分布（80 个提交）：feat 31、fix 10、build 10、refactor 8、docs 8、test 5、chore 3、perf 1，
+  另有 4 个早期中文前缀提交（`移植：`/`界面：`/`短剧：`）——规范是 10-16 才引入的。
+- 一个提交做一件事；**测试可以单独 `test:` 提交**（如 `8d7853a test: 阅读页顶栏显示书名的用例`）；
+  一个版本通常拆成「feat/fix 实现 + build/chore 发布 + docs 记录」三类提交。
+- 需要展开的提交确实写正文（`- ` 列点说明改了什么、为什么），发版记录会引用构建源码提交哈希。
+
+### 2.7 收尾
+
+- note 状态改 `implemented` 并移到对应分类；证据进 `docs/ux-evidence/<日期>-<主题>/`；
+  README/AGENTS 里过时的说明同步改（数字、命令、限制）。
+- 工作区状态要可解释：发版前确认没有混入无关的未提交改动。
+
+---
+
+## 3. 修改（bug 修复）：六步
+
+1. **复现**：真机 / 模拟器 / 原始日志 / 录屏 / 受控数据。设备端优先用深链 + `am instrument`
+   直达现场（见 §5.2），因为这台机器的 MIUI 禁了 `adb shell input`。
+2. **定位根因**：先解释现象为什么发生，再改；必要时对照 Legado 源码或上游实现
+   （规则引擎的多轮对齐就是这么做的）。
+3. **补定向测试**：能断言的先写断言（数据层/排序/迁移），纯视觉的用截图回答。
+4. **最小修复**：不夹带无关重构；行为变化拆出单独提交/单独 note。
+5. **取证**：截图、instrument 原始输出、logcat；失败和宿主缺失的记录也保留，不粉饰。
+6. **写 bug-fix note**（Problem/Decision/Alternatives/Validation/Consequences）并提交。
+
+修复准则（来自已有笔记）：
+
+- **不要靠文案猜状态**：网络问题用显式 `BookCacheState.waitingForNetwork` 和
+  `cacheTask = waiting_network`，不解析本地化错误文案。
+- **保持旧数据契约**：旧 `incomplete` 记录不强行迁移，重试时按实际原因重新分类。
+- **用户反馈优先于设计图**：例如书架标签 14sp/等宽底色、书名居中，按用户真机意见覆盖设计示例。
+- **只跑受影响的用例**，不因为一个小修跑整套无关回归（AGENTS.md「别跑没用的测试」）。
+
+五个典型根因（README「踩出来的坑」完整版，都留在代码注释里）：
+
+| 现象 | 根因 | 修法 |
+|---|---|---|
+| 服务端回了 153KB，客户端拿到 0 字节 | `withContext(IO)` 返回后切回主线程再读 `body.string()`，抛异常被 `runCatching` 吞成空串 | 整个 `send()` 含读 body 放 IO；空 body 当可重试错误 |
+| 重启后短剧列表/搜索回 200 + 空 body | GET 没走站源握手；身份按含随机端口的完整 URL 存，重启失配 | GET 也握手；身份按 host 存 |
+| 点听书又立刻关掉 → 进程被杀 | 前台服务必须 5 秒内 `startForeground()`，启动被 stop 抢先 | `onCreate` 即进前台；停止改发 `ACTION_STOP` |
+| 正文第一行被顶栏压住 | `Scaffold` 已消费 insets，读 `statusBars` 得 0 | 实测顶栏/底栏高度再传给阅读器，分页与渲染同一份 |
+| 短剧库某些接口 200 + 空 body | 服务端 `writeJSON` 吞编码错误 | 打补丁先 Marshal 到内存，失败回 502 带原因 |
+
+---
+
+## 4. 优化：性能 / 重构 / 做减法 / 界面收口
+
+### 4.1 性能（`perf:`）
+
+套路固定：**先证明瓶颈在主线程或慢链路 → 移位 IO / 加超时 / 加缓存 / 限数量 → 失败时保留旧内容**。
+代表提交 `d7635c5 perf: 书城漫画推荐位移出主线程并加缓存`：
+
+- 发现页 JS 初始化与网络改到 `Dispatchers.IO`，切漫画 tab 不再卡主线程；
+- 单源 10 秒超时，坏源不拖住整个推荐位；成功源回写 `lastSuccessAt`，下次优先问；
+- 推荐结果落盘缓存 7 天：冷启动先上上次的榜，网络回来再替换；
+- 首页榜单最多 30 本，减少封面解码与列表长度；取榜失败不清空已有内容。
+
+能算出数的要给出数：缓存导出单本 999 章 / 6.4MB 正文，真机 TXT 约 1.8 秒、EPUB 约 1.7 秒。
+性能提交不配「冒烟测试」，用可观察行为（切 tab 不卡、坏源不影响其他源）和截图/日志说明。
+
+### 4.2 重构（`refactor:`，不改行为）
+
+- 对齐上游语义：规则求值改成 Legado 的 `SourceRule` 管道、JS 绑定按 Legado 语义对齐、
+  规则预处理复刻 Legado——分多次 refactor 提交，每次保持可编译、现有用例可过。
+- 收口重复结构：组件「空/加载/失败」三态收口、在线详情与短剧卡收口（`5d724d0`、`a0843a4`）。
+- **重构不改行为**：真要改行为就拆成 feat/fix；重构提交的说明里写清边界。
+
+### 4.3 做减法（`simplification`）
+
+主动删冗余 UI，每项一篇 note + 前后对照截图，同时写清「不这么做会怎样」的备选：
+
+- 底部导航激活态去掉下划线、我的页去掉标题副标题、阅读页去掉常驻页脚信息、
+  小说下载范围/预下载数量改成文字选项按钮、升级卡片重排信息层级。
+- 减法同样以用户反馈为最高优先级；设计图没覆盖的取舍，在 note 的
+  `Alternatives considered` 里交代。
+
+### 4.4 界面收口（设计 vs 实际）
+
+- 逐页对照设计编号：先拍实际截图，再和 designed.md 该页并排看，列出偏差 → 修正 → 复拍。
+- 77 项清单里有 17 项先有真机截图、其余 60 项后来补；最终交付 76 个运行页面/状态的
+  模拟器验收图库（[docs/ux-evidence/2026-10-27-emulator-acceptance/index.html](ux-evidence/2026-10-27-emulator-acceptance/index.html)）。
+- 覆盖表要区分：本轮截图 / 交互断言 / 外部服务未覆盖，避免把「编译过」当「整页验收」。
+
+---
+
+## 5. 测试：分层与取舍
+
+### 5.1 分层
+
+| 层 | 位置 | 覆盖什么 | 什么时候跑 |
+|---|---|---|---|
+| JVM 单测 | `app/src/test/`（5 个文件 / 26 个用例） | 搜索排序、发现筛选、进度合并、阅读身份、睡眠定时 | 改到对应纯逻辑时 |
+| 设备自检 | `app/src/androidTest/.../SelfCheckTest.kt` | TXT/EPUB 导入与分章、编码识别、Legado 引擎打 MockWebServer、短剧库起进程出推荐、Edge TTS 合成 mp3、导出 TXT/EPUB | 改动这些链路时 |
+| 界面走查 | `*FullUiAuditTest` + 各功能 `*UiTest` | 进程内驱动真实 Compose 组件，逐屏断言 + 截图（`FullUiAuditBase` 提供隔离 Room、隔离 preferences、字体/密度/明暗模拟） | 界面改动 |
+| 数据/迁移 | `*DataTest`、`*MigrationTest` | Room 迁移、缓存状态、搜索分档 | 数据层/DB 改动 |
+| 真实源探针 | `VeneraProbeTest` | 逐源「搜索 → 目录 → 前两张图下载校验魔数」 | 换源/补源/改运行时 |
+| 更新检查 | `UpdateCheckTest` | MockWebServer 打真实请求 + 解析 | 改更新逻辑 |
+
+androidTest 下共 55 个 `.kt`：52 个含用例（合计 174 个 `@Test`），另 3 个是辅助
+（`FullUiAuditBase` 基类、`ReadingFixtures`/`ExperienceFixtures` 夹具）；其中 **22 个界面类继承
+`FullUiAuditBase`**。受控媒体与书单资产在 `app/src/androidTest/assets/`。
+
+### 5.2 怎么跑
+
+```bash
+# ① 编译测试包
+./gradlew :app:assembleDebugAndroidTest
+
+# ② 纯 JVM 单测（按需 --tests 过滤，报告在 app/build/test-results/）
+./gradlew :app:testDebugUnitTest --tests com.lizhiwei.momofish.data.ProgressMergeTest
+
+# ③ 只跑一个类 / 一个方法（日常首选；不会卸载 app）
+adb shell am instrument -w -e class com.lizhiwei.momofish.SelfCheckTest \
+  com.lizhiwei.momofish.debug.test/androidx.test.runner.AndroidJUnitRunner
+adb shell am instrument -w -e class com.lizhiwei.momofish.ReaderLayoutUiTest#xxx \
+  com.lizhiwei.momofish.debug.test/androidx.test.runner.AndroidJUnitRunner
+
+# ④ 全套（注意：跑完会卸载 app，数据一起没）；要保留安装包加：
+#   -Pandroid.injected.androidTest.leaveApksInstalledAfterRun=true
+./gradlew :app:connectedDebugAndroidTest
+
+# ⑤ 界面核对 + 截图归档（清旧图、起宿主、跑指定类、拉 full-*.png、写 result/host/run.json）
+python3 scripts/run-ui-audit.py \
+  --target com.lizhiwei.momofish.AppColorThemeUiTest \
+  --out docs/ux-evidence/2026-10-29-app-color-themes/ui \
+  --serial d3ed3c68
+
+# ⑥ 把某一轮全部截图汇总成「设计图 vs 实际」验收图库
+#   scripts/build-emulator-acceptance.py 无参数、路径硬编码，是一次性汇总工具
+python3 scripts/build-emulator-acceptance.py
+```
+
+排障深链（禁点击注入时的主要手段，定义在 `MainActivity`）：
+
+```bash
+adb shell am start -n com.lizhiwei.momofish.debug/com.lizhiwei.momofish.MainActivity \
+  --es tab shelf | store | playlet | mine | search \
+  --es page about --es book <id> --es cache <id> --es storetab manga \
+  --es kw 剑来 --es q 关键词 --es pane search|rank|mine --es readermode PAGED
+```
+
+### 5.3 选择原则（AGENTS.md）
+
+- 改完 Kotlin 先 `:app:compileDebugKotlin`；库/引擎类纯逻辑跑设备自检；界面改动用截图；
+  需要点击才能看到的中间状态，临时把状态强制成那个值截一张，**看完立刻改回去**。
+- 不写、不跑没有断言价值的「冒烟测试」：装完包 `am start` 看一眼没崩、为了确认能跑重复跑已有测试、
+  给一次性临时改动补测试、与改动无关的回归重跑——都不算验证。
+- 一次改动只跑受影响用例；失败日志保留，不重跑凑绿。
+
+### 5.4 当前测试缺口（别假装没有）
+
+- **没有 CI**：所有构建/测试/发版都是本机手工执行，靠脚本和记录保证可复现。
+- README「自检」里的 `UiWalkthroughTest` 已被 `*FullUiAuditTest` 系列取代，命令是旧的；
+  截图默认落在 app 私有 `files/ux-reliability/`，不是 README 写的 `files/shots`。
+- `scripts/run-ui-audit.py`、`scripts/build-emulator-acceptance.py` 没有被 README/AGENTS 引用，
+  后者路径写死某一轮证据目录，不能直接复用。
+- 公网书源、WebDAV、在线 TTS 依赖网络环境，不能作为稳定断言；Venera 探针在真机上通常要
+  `adb reverse tcp:7897 tcp:7897` 借本机代理。
+- 单测只覆盖纯逻辑，UI 主要靠截屏 + 回调查断言，不做像素级对比。
+
+---
+
+## 6. 验证：证据链与如实记录
+
+### 6.1 证据放哪、长什么样
+
+界面/功能验证的证据统一进 `docs/ux-evidence/<日期>-<主题>/`（当前 30 个目录、24 份 README、
+约 1,049 张 PNG、201 份 `result.txt`）：
+
+```text
+docs/ux-evidence/2026-10-29-app-color-themes/
+  README.md              # 设备、时间、构建、跑法、断言结果、截图说明、未覆盖范围
+  theme-preview.png      # 能直接回答"对不对"的截图
+  data-tests.txt         # 原始 XML/文本测试输出
+  ui/result.txt          # instrumentation 原始输出（失败也保留）
+  ui/run.json            # run-ui-audit.py 产出的 serial/target/capturedAt/apkSha256/passed/screenshots
+  actual-app/checks.json # 实际操作步骤与系统配置恢复记录
+```
+
+- README 模板（从 24 份归纳）：`① 标题 + 日期 + 设备/系统/分辨率` → `② 本轮改了什么` →
+  `③ 编译/构建结果（并声明「构建成功不替代断言」）` → `④ 核对表：场景 | 实际断言 | 原始日志链接` →
+  `⑤ 每张截图说明它能回答什么问题` → `⑥ 范围与差异：没做什么、外部服务没覆盖什么` →
+  `⑦ 失败记录链接与「不计为通过」说明` → `⑧ 指向对应 Agent Note` → `⑨ 是否已随版本发布`。
+- M/L 使用完整模板；S 级纯视觉/文案可用 `docs/ai-workflow.md` §17.4 三段精简模板，保留环境与产物、核对与原始输出、复跑、失败及未验证范围。
+- 失败记录保留（例如「测试宿主缺失」的 result.txt 明确写「不计为通过」），不把旧图/new build
+  混用；重拍要说明本轮构建时间。截图存设备原始分辨率、不裁剪（局部图只裁底部且不修图）。
+- 截图命名两种风格并存：全量验收用设计编号（`P01`/`B12`/`S13`/`D07`），单点证据用描述性
+  kebab-case；验收图库按设计编号索引（`index.html` + 逐页对照图 + `audit.json` 字段
+  `id/design/code/log/sha256/device/captureRun`）。
+
+### 6.2 真机 vs 模拟器
+
+- 真机：小米 12S（`22081212C`，序列号 `d3ed3c68`，Android 15，1220×2712），MIUI 禁点击注入，
+  所以主要靠深链 + `am instrument`；纯视觉核对用 `adb exec-out screencap -p`。
+- 模拟器：`emulator-5554`（Android 16，1080×2400），用于 76 项验收、360dp、1.3 倍字号、
+  深浅色和动效帧核对。
+- 改过系统字体/密度/主题/开关的，验证完要恢复并记录（app-color-themes 的 note 明确写了恢复原值）。
+
+### 6.3 隔离数据，不碰用户数据
+
+测试用内存 Room + 随机命名 preferences + 受控媒体资产（`reading-resume.mp4` 等），
+结束后删临时书目/记录；不读也不改正式包数据。这样加载态、错误态、空态才能稳定复现。
+
+### 6.4 截图标准
+
+- 截图必须**能直接回答问题**：布局对不对、有没有裁切、字号/间距/颜色是否按设计。
+- 一张图证明交互不够时，补回调断言、录屏或中间态截图；不能把「截图好看」说成「功能通过」。
+
+### 6.5 发布验证（线上核对）
+
+发布后的核对不是「部署成功」，而是**下载回来再核对一遍**（1.0.12 样板，14 项）：
+
+| 项 | 1.0.12 实际值 |
+|---|---|
+| 构建 | `BUILD SUCCESSFUL in 1m 3s`（原始输出留 `docs/releases/1.0.12-build.txt`） |
+| 包名/版本 | `com.lizhiwei.momofish` / 1.0.12（10012） |
+| 安装包字节 | 28,256,515（本地 / 线上 / GitHub 三处一致） |
+| SHA-256 | `b31b3569…20047a1` |
+| 正式签名 | `52f46d6f…ebd29db`，与 1.0.11 相同（可覆盖升级） |
+| 默认接口 | `/api/latest` 返回 10012、changelog、sha256、`force: false` |
+| APK 直链 | `HTTP 200`、`content-type: application/vnd.android.package-archive`、长度一致 |
+| GitHub Release | `v1.0.12` 指向构建源码 `da36919`，资产摘要一致 |
+| 真机安装 | **本版没做**，记录里明确写「没有安装到真机验收」 |
+
+核对命令（结果落 `docs/releases/<版本>-online.json`）：
+
+```bash
+curl -sS https://update.leempty.site/api/latest
+curl -L -o output/momofish-<ver>-online.apk https://update.leempty.site/app-release.apk
+shasum -a 256 output/momofish-<ver>-online.apk
+apksigner verify --print-certs output/momofish-<ver>-online.apk
+```
+
+注意接口和 APK 都带 `Cache-Control: s-maxage=60`，**最多等 1 分钟缓存过期**再判断是否生效。
+
+### 6.6 如实记录边界
+
+所有对外结论都要区分「编译通过 / 跑过哪些断言 / 看过截图 / 真机验证 / 未验证」。
+例：`design.md` 里直接写「当前无真机/模拟器，未截图、未跑 connectedDebugAndroidTest」；
+这对后续接手的人是重要信息，不是减分项。
+
+---
+
+## 7. 发布：从版本号到线上
+
+### 7.1 版本号规则
+
+`versionCode = 主版本 × 10000 + 次版本 × 100 + 修订`（1.0.12 → 10012）。客户端只按
+`versionCode` 比大小，所以**必须单调递增**；从 0.1.0（1）到 1.0.0（10000）是一次性拉直，
+之后每个补丁版 +1（1.0.1→10001 … 1.0.12→10012）。
+
+### 7.2 发布前检查
+
+1. 工作区干净、`origin/main` 无分叉；本批验证已完成并留证据（不重复跑无关测试）。
+2. 资产有变才重跑对应管线（短剧库 / 书源 / Venera / 品牌资产，见 §8.2）。
+3. 改 `app/build.gradle.kts` 的 `versionCode` / `versionName`。
+4. 改 `vercel/update/api/latest.js` 的 `changelog` / `force`（脚本不动这两项）。
+
+### 7.3 构建并留原始输出
+
+```bash
+./gradlew :app:compileDebugKotlin :app:assembleRelease --console=plain 2>&1 \
+  | tee docs/releases/<ver>-build.txt
+```
+
+### 7.4 `vercel/update/deploy.sh` 做了什么
+
+1. 除非 `--no-build`，先 `./gradlew :app:assembleRelease`；
+2. 把 APK 复制到 `vercel/update/public/app-release.apk`；
+3. 从 `build.gradle.kts` 读 versionCode / versionName；
+4. 算 SHA-256 和字节数，用内联 node 脚本写回 `api/latest.js`（`apkUrl` / `sha256` / 版本）；
+5. `vercel link` 到既有项目 `momofish-update`（`deploy` 不接受 `--project`）；
+6. `vercel deploy --prod`；
+7. 自检：`curl /api/latest` 和 APK 直链 HEAD（**只验可达，不比对 sha256**，完整核对靠人工）。
+
+`--no-build` 用于「包已核对、只补部署/换元数据」；1.0.12 就是这么发的。
+
+### 7.5 双通道与标签
+
+- **主通道**：Vercel 更新站（App 内「检查更新」走 `https://update.leempty.site/api/latest`）。
+- 启动提醒门槛由可选 `minRecommendedVersionCode` 控制，发布者按关键修复范围维护；部署脚本保留此字段。客户端的检查间隔、忽略和冷却规则见 [更新接口说明](../vercel/update/README.md#启动更新提醒)。
+- **镜像/发布页**：GitHub Release，标签 `v<版本>` 指向**实际构建源码提交**，上传同一 APK。
+- 发布记录/元数据的后续提交**不移动标签**；GitHub Release 目前是人工步骤（仓库无 `gh` 脚本）。
+
+### 7.6 发布记录七件套（`docs/releases/`）
+
+| 文件 | 内容 | 从哪版开始 |
+|---|---|---|
+| `<ver>.md` | 发布记录正文：更新内容 / 构建与包核对 / 发布位置与线上核对 / 验证范围 | 1.0.7 |
+| `<ver>-package.json` | 本地包核对数据（包名/版本/签名/字节/SHA/内容抽查/源码提交） | 1.0.7 |
+| `<ver>-online.json` | 线上完整下载核对数据 | 1.0.7 |
+| `<ver>-build.txt` | gradle 构建原始输出 | 1.0.10 |
+| `<ver>-deploy.txt` | `deploy.sh` 部署原始输出 + curl 自检 | 1.0.10 |
+| `<ver>-github.json` | GitHub Release 核对 | 1.0.12 |
+| `<ver>-latest.json` | 部署后接口返回快照 | 1.0.12 |
+
+> `deploy.sh` 只负责写 `api/latest.js` + 部署 + curl 自检；`docs/releases/` 里的记录全是人工整理的
+> （终端输出 tee 成 txt、核对数据写成 json），脚本不生成。
+
+### 7.7 发布坑位
+
+- 国内直连 `*.vercel.app` 会超时，必须用自有域名；Cloudflare 记录保持**仅 DNS**（开橙云 525）。
+- **不要用 Serverless Function 转发 APK**（响应上限 4.5MB，包 28MB+），放 `public/` 静态文件。
+- 签名必须一直是同一把 keystore，否则装不上/无法覆盖升级；`apkUrl` 必须能直接拿到 APK。
+- 接口有约 1 分钟 CDN 缓存，发版后别过早下「没生效」的结论。
+- 本地 `output/` 产物命名（手工，非脚本）：`momofish-<ver>.apk`、`momofish-<ver>-online.apk`、
+  `momofish-<ver>-package.json`、`momofish-<ver>-release-notes.md`；`output/` 整体 gitignore。
+
+---
+
+## 8. 资产、文档与协作约定
+
+### 8.1 工作流是逐步长出来的
+
+- 10-15 ~ 10-27：只有 README + 提交 + 设计文档；10-27 全天 0 提交，10-26/27 的工作笔记、
+  76 项验收截图等全部堆在工作区，10-28 由 `c7c51af` 一次性提交（1,300 文件 / +44,458 行，
+  其中 1,116 个是 `docs/ux-evidence` 证据），并同时引入 `docs/ux-evidence/`、`docs/releases/`、`scripts/`。
+- 10-28 起形成「proposed note → 实现 → 截图证据 → implemented note → 提交」的稳定节奏；
+  1.0.7 起每版都有发布记录。
+- 所以本文是**对既成事实的归纳**：遇到与本文冲突的旧文档，以代码、资产和最新 note 为准。
+
+### 8.2 四条内置资产管线（有变才重跑）
+
+| 资产 | 来源 | 命令 / 产物 | 注意 |
+|---|---|---|---|
+| 短剧库（1.0.12 及以前） | 仓库外 Go 源码（默认 `~/Downloads/短剧库`） | `bash Tools/build-juku-android.sh` → `libjuku.so`（不入库） | 历史管线，脚本已移除；1.0.13 改为 openhongguo AAR，随 Gradle 获取 |
+| Legado 书源 | mac 版语料 + `../qingdeng` 引擎 | `Tools/legado-probe/run.sh` 三段探针 → 过滤 → gzip 成 `assets/book_sources.json.gz` | 运行时名是 `book_sources.json`；当前 107 条 |
+| Venera JS 漫画源 | EZVenera-config / kuiti 源仓库 | Babel preset-env(ie11) **一次性离线转译** → `assets/venera/` | 转译脚本未入库；当前 `index.json` 16 份 |
+| 品牌/图标/动效 | 生图原稿 + 人工清理 SVG | `scripts/export-brand-assets.py`、`scripts/export-brand-motion.py` | 自适应图标安全圆；启动动效帧脚本未入库 |
+
+### 8.3 文档与证据的写法
+
+- 相对链接引用仓库内文件；日期用 `YYYY-MM-DD`；版本记录写「源码提交 + 字节 + SHA-256 + 签名」。
+- Agent Note 的当前模板、状态和分类规则以 `docs/ai-workflow.md` 为准，仓库自检脚本为 `scripts/check-workflow.py`；换机器/换人不依赖作者本机技能目录。
+- 笔记里「未验证」必须明说；不要把「编译过」写成「验证通过」。
+- 改动后同步更新 README 的过时数字/命令；当前已知文档漂移见 §9。
+
+### 8.4 提交与发版的配对
+
+- 功能/修复 + 版本号提升 → `feat:`/`fix:`
+- 发布配置/接口元数据 → `build:`/`chore:`
+- 发布记录与线上核对 → `docs:`
+- 测试单独补 → `test:`；规则引擎/结构收口 → `refactor:`
+
+---
+
+## 9. 已知不一致与缺口（截至 1.0.12）
+
+| 项 | 现状 | 建议 |
+|---|---|---|
+| README Venera 份数 | README/THIRD-PARTY 写 9，`assets/venera/index.json` 与 `VeneraManifest.kt` 是 16 | 以代码/资产为准，改 README |
+| README 内置书源总数 | 写「116 份」（105+2+9）；实际 `book_sources.json.gz` 107 条 + Venera 16 条 | 更新口径 |
+| 短剧核心迁移（1.0.13 已发布） | `93df2bb` 使用 `io.github.beilunyang:openhongguo:0.1.0`（AAR），已删 `Tools/build-juku-android.sh` 与 `playlet/juku/*`，正式版构建源码 fe81f19，见 [发布记录](releases/1.0.13.md) | §1.3/§1.4/§8.2 的 juku 描述保留作历史，当前构建按 README |
+| README 自检命令 | 提到已不存在的 `UiWalkthroughTest` | 换成 `*FullUiAuditTest` 示例 |
+| 版本标签 | 2026-10-30 fetch 获取已有 `v1.0.12`，核对指向发布源码 `da36919`；没有创建或移动标签 | 后续发版继续核对标签与实际构建源码 |
+| GitHub Release | 无脚本，人工建标签/传包 | 保持人工，但写入 Runbook |
+| `deploy.sh` 自检 | 只 curl 可达，不比对 sha256 | 完整核对按 §6.5 人工执行 |
+| Venera 转译 / 动效帧脚本 | 一次性工具，不在仓库 | 换源/换素材时要重造，已知代价 |
+| 短剧库补丁 | `THIRD-PARTY.md` 与首条提交正文都说有两个补丁，仓库里只有 `0002-visible-json-errors.patch`，`0001-native-cenc-decrypt.patch`（红果 CENC 解密）缺失 | 重建短剧库前向作者索取 |
+| Agent Note 规范 | 2026-11-04 已固化至 ai-workflow §5.1/§17.2 和 check-workflow.py | 按仓库规范执行并跑定向回归 |
+| 归档入链 | 2026-11-04 已修复 mine-group-header 的跨生命周期引用，并追加维护说明 | 自检现覆盖 Note 和嵌套证据 README 的本地链接 |
+| 签名 | keystore 与明文密码随仓库（自用取舍） | 对外分发前需换签名方案 |
+| 证据 README | 30 个证据目录中 24 个有 README，6 个纯视觉小改动只有截图 | 新证据一律写 README |
+| CI | 无；全部本机手工 | 现阶段接受，靠记录与脚本复现 |
+
+---
+
+## 10. 一页纸清单
+
+**开始一轮改动**
+
+1. 明确需求来源（用户 / 设计编号 / 截图问题 / 探针失败）。
+2. 非平凡改动先写 `proposed` note（Problem / Proposal / Alternatives / Acceptance / Risks）。
+3. 界面改动先查 designed.md 对应页与令牌。
+4. 改代码 → `:app:compileDebugKotlin`。
+5. 补定向测试/截图；只跑受影响用例。
+6. note 转 `implemented`，证据进 `docs/ux-evidence/`。
+7. 按 Conventional Commits 提交（一提交一件事，必要时拆 `test:`）。
+
+**修一个 bug**
+
+1. 复现（深链/隔离数据/日志）→ 2. 根因 → 3. 定向测试 → 4. 最小修复 →
+5. 截图或断言取证（失败也留）→ 6. `implemented/bug-fix` note → 7. 提交。
+
+**发一版**
+
+1. 工作区干净、验证已完成 → 2. 改 versionCode/Name + latest.js changelog →
+3. `compileDebugKotlin assembleRelease` 并 tee build.txt → 4. 本地包核对 →
+5. `./vercel/update/deploy.sh [--no-build]` → 6. 等 1 分钟缓存，完整下载核对 →
+7. GitHub Release（人工，标签指构建源码）→ 8. 写 `docs/releases/<ver>.md` 与 json →
+9. `docs:`/`build:` 提交推送，**标签不移动**。
+
+**交付验收**
+
+1. 证据目录有 README + 原始输出 + 能回答问题的截图；
+2. 区分「截图证明 / 断言证明 / 未验证」；
+3. 设计编号可回溯（Pxx/Bxx/Sxx/Dxx）；
+4. 设备、构建 SHA、时间可追溯。
+
+---
+
+## 附录：命令速查
+
+```bash
+# 编译
+./gradlew :app:compileDebugKotlin
+./gradlew :app:assembleDebug
+./gradlew :app:assembleRelease --console=plain
+
+# 测试
+./gradlew :app:assembleDebugAndroidTest
+./gradlew :app:connectedDebugAndroidTest          # 会卸载 app，数据丢失
+adb shell am instrument -w -e class <类名[#方法]> \
+  com.lizhiwei.momofish.debug.test/androidx.test.runner.AndroidJUnitRunner
+python3 scripts/run-ui-audit.py --target <类名> --out <证据目录> --serial d3ed3c68
+
+# 截图 / 日志
+adb exec-out screencap -p > shot.png
+adb logcat -d -s VeneraProbe:I | tail -20
+adb reverse tcp:7897 tcp:7897                      # 给设备借本机代理
+
+# 内置资产
+# 短剧 SDK 自 1.0.13 随 Gradle 获取，不再单独构建 Juku 二进制
+bash Tools/legado-probe/run.sh "<书源语料.json>" /tmp/probe
+python3 scripts/export-brand-assets.py
+python3 scripts/export-brand-motion.py --source <原稿.png> --dependencies <含vtracer的目录>
+
+# 发布
+./vercel/update/deploy.sh
+./vercel/update/deploy.sh --no-build
+```
+
+## 相关文档
+
+- [README.md](../README.md) — 功能、模块地图、构建、自检、踩坑
+- [AGENTS.md](../AGENTS.md) — 提交与验证硬约定
+- [designed.md](../designed.md) — v3 设计规范（77 页）
+- [.agents/notes/](../.agents/notes/) — 决策记录
+- [docs/ux-evidence/](ux-evidence/) — 截图与断言证据
+- [docs/releases/](releases/) — 发版与线上核对
+- [vercel/update/README.md](../vercel/update/README.md) — 更新站与发布脚本

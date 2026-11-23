@@ -1,0 +1,113 @@
+#!/usr/bin/env python3
+"""汇总各轮已验证模拟器截图；保留原图、来源、日志与设计差异说明。"""
+import hashlib
+import html
+import json
+import shutil
+import struct
+from pathlib import Path
+
+root = Path(__file__).resolve().parents[1]
+source = root / 'docs/ux-evidence/2026-10-27-full-uiux'
+out = root / 'docs/ux-evidence/2026-10-27-emulator-acceptance'
+(out / 'screenshots').mkdir(parents=True, exist_ok=True)
+rows = json.loads((source / 'audit.json').read_text())
+groups = {
+    'shelf-tags-acceptance': 'P01 P02 P03 B01 B02 B03 B04 B05 B06 B23 D01',
+    'discovery-verified': 'P04 P05 P08 P09 B07 B08 D02 D03',
+    'reader-acceptance': 'P11 P12 P13 B09 B10 B11 B16 S06 D07 D08',
+    'settings-verified': 'P22 P23 P27 D04',
+    'appearance-acceptance': 'P28 B12 B13',
+    'about-acceptance': 'P29',
+    'empty-shelf-acceptance': 'S01',
+    'empty-discovery-acceptance': 'S02',
+    'sync-acceptance': 'P24 S14',
+    'player-acceptance-final': 'P21 B19',
+    'splash-acceptance': 'P30',
+}
+overrides = {key: f'{group}/{key}.png' for group, keys in groups.items() for key in keys.split()}
+overrides.update({'S05': 'discovery-verified/S05-discovery.png', 'S12': 'sync-acceptance/S12-summary.png'})
+notes = {
+    'P01': '按用户反馈：状态标签14sp、等宽底色、8dp间隔；书名与状态居中，更多图标贴近封面右上角。360dp、1.3倍字号四个标签均完整，另有大字号截图。缺封面使用真实占位组件。',
+    'P03': '批量选择、移除恢复和整理动作已核对；书名、作者、状态按用户反馈居中。',
+    'P11': '本轮重新以左右分页模式拍摄；章标题与轻量页头分开，不再使用此前截到滚动模式的图片。正文、字号和主题使用隔离设置。',
+    'P12': '左右分页模式控制展开，顶栏为书名，正文章标题、进度和工具栏互不遮挡。',
+    'P21': '按用户反馈移除底部重复播放键；中央仅一个播放／暂停入口。点画面显隐控件，播放中3秒收起；底部渐变随实际控件高度覆盖到手势区。亮色测试视频用于检查遮罩，未使用正式短剧素材。',
+    'B19': '选集浮层保留视频上下文，遮罩覆盖底层画面与操控条；同一真实播放器选集从零开始。',
+    'P22': '模拟器重新拍摄；阅读时长来自临时隔离书目的实际阅读记录，结束后删除。',
+    'P23': '新增有数据状态：七天柱状图、真实聚合排行和打开书籍目标；清空确认取消后记录保持。演示记录结束后删除。',
+    'P24': '模拟器隔离设置的默认表单，不包含用户WebDAV凭据；开关、地址校验和提交摘要另有交互断言。',
+    'P29': '补拍已是最新状态，检查更新和项目说明入口回调有断言；有新版本见S13。',
+    'P30': '真实Android系统启动屏的ADB截图。纸白底与原有透明吉祥物；系统启动机制未增加设计示例中的额外品牌文字。',
+    'B12': '默认设置入口复用真实排版控件；字号修改写入设置。长面板可滚动，阅读器夜间背景版本另有截图。',
+    'S12': '真实同步结果摘要已完整露出，键盘已收起。现有同步契约只提供未匹配数量，没有设计图中的逐项未匹配书目明细；此项仍有能力差异。',
+}
+for row in rows:
+    key = row['id']
+    if key == 'M01':
+        continue
+    old = row['screenshot']
+    src = source / overrides.get(key, old)
+    if key not in overrides:
+        assert '模拟器' in row['device'], (key, '不允许混入旧真机图')
+    assert src.exists(), (key, src)
+    data = src.read_bytes()
+    assert data[:8] == b'\x89PNG\r\n\x1a\n'
+    assert struct.unpack('>II', data[16:24]) == (1080, 2400), (key, '设备尺寸不符')
+    dst = out / 'screenshots' / f'{key}.png'
+    shutil.copy2(src, dst)
+    log = src.parent / 'result.txt'
+    if key != 'P30':
+        assert log.exists() and 'OK (' in log.read_text(), (key, '没有对应通过日志')
+    row.update({
+        'screenshot': f'screenshots/{key}.png', 'source': '../2026-10-27-full-uiux/' + str(src.relative_to(source)),
+        'sha256': hashlib.sha256(data).hexdigest(), 'device': 'Android 16 · emulator-5554 · 1080×2400',
+        'log': '../2026-10-27-full-uiux/' + str(log.relative_to(source)),
+        'verification': '本次续接重新拍摄' if key in overrides else '沿用同轮已核对模拟器证据，来源与日志可查',
+        'note': notes.get(key, row['note']),
+    })
+    run = src.parent / 'run.json'
+    if run.exists():
+        row['captureRun'] = json.loads(run.read_text())
+
+extras = []
+for name, label, folder in [
+    ('P01-large', '书架 · 360dp／1.3倍字号', 'shelf-tags-acceptance'),
+    ('P21-resolving', '播放器 · 正在取流', 'player-acceptance-final'),
+    ('P21-loading-tapped', '播放器 · 加载时点击画面', 'player-acceptance-final'),
+    ('P21-buffering', '播放器 · 媒体缓冲', 'player-acceptance-final'),
+    ('P21-paused', '播放器 · 暂停', 'player-acceptance-final'),
+    ('P21-controls-hidden', '播放器 · 控制层隐藏', 'player-acceptance-final'),
+    ('P21-seek', '播放器 · 拖动进度', 'player-acceptance-final'),
+    ('P21-failed', '播放器 · 失败重试', 'player-acceptance-final'),
+    ('B12-night', '阅读器 · 夜间排版浮层', 'reader-acceptance'),
+]:
+    src = source / folder / (name + '.png')
+    shutil.copy2(src, out / 'screenshots' / src.name)
+    extras.append({'id': name, 'name': label, 'screenshot': 'screenshots/' + src.name})
+(out / 'audit.json').write_text(json.dumps({'pages': rows, 'extraStates': extras}, ensure_ascii=False, indent=2) + '\n')
+
+e = html.escape
+cards = []
+for row in rows:
+    if row['id'] == 'M01':
+        continue
+    cards.append(f'''<article id="{row['id']}" data-search="{e(row['id']+' '+row['name'])}">
+<div class="head"><h2>{row['id']} · {e(row['name'])}</h2><span>{e(row['verification'])}</span></div>
+<div class="pair"><figure><figcaption>设计参照</figcaption><a href="{e(row['design'])}" target="_blank"><img loading="lazy" src="{e(row['design'])}" alt="{row['id']}设计图"></a></figure><figure><figcaption>安卓模拟器 · 原始截图</figcaption><a href="{row['screenshot']}" target="_blank"><img loading="lazy" src="{row['screenshot']}" alt="{e(row['name'])}模拟器截图"></a></figure></div>
+<p>{e(row['note'])}</p><footer><a href="{row['source']}">原始来源</a><a href="{row['log']}">运行记录</a><a href="{row['code']}">界面代码</a><a href="#{row['id']}">本页链接</a></footer></article>''')
+extra_html = ''.join(f'<figure id="{x["id"]}" data-search="{e(x["id"]+" "+x["name"])}"><figcaption>{e(x["name"])}</figcaption><a href="{x["screenshot"]}" target="_blank"><img loading="lazy" src="{x["screenshot"]}" alt="{e(x["name"])}"></a></figure>' for x in extras)
+page = '''<!doctype html><html lang="zh-CN"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>momoのfish · 模拟器验收截图</title>
+<style>*{box-sizing:border-box}body{margin:0;background:#f7f8f5;color:#222a24;font:15px/1.65 system-ui,-apple-system,sans-serif}header,main{max-width:1500px;margin:auto;padding:24px}header h1{font-size:28px;margin:0}p{max-width:100ch}a{color:#245240}nav{position:sticky;top:0;background:#eef1eaf2;backdrop-filter:blur(10px);z-index:2;padding:12px 24px;display:flex;gap:16px;align-items:center;flex-wrap:wrap}input{font:inherit;padding:10px 14px;border:1px solid #b8c5ba;border-radius:10px;min-width:280px}h2{font-size:19px;margin:0}.head{display:flex;justify-content:space-between;gap:16px}.head span{font-size:12px;color:#687269}article{background:white;border:1px solid #e1e5dd;border-radius:16px;padding:20px;scroll-margin-top:95px}#pages{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:20px}.pair{display:grid;grid-template-columns:1fr 1fr;gap:12px}figure{margin:12px 0}figcaption{font-size:13px;color:#687269;padding-bottom:8px}img{display:block;max-width:100%;height:540px;object-fit:contain;object-position:top;background:#f4f5f2;border:1px solid #edf0e9;border-radius:6px}article p{font-size:14px}footer{display:flex;flex-wrap:wrap;gap:16px;font-size:13px}#extras{scroll-margin-top:96px;display:grid;grid-template-columns:repeat(3,1fr);gap:24px;margin-bottom:32px}#extras img{height:570px}button{font:inherit;background:#2f6b57;border:0;color:white;border-radius:8px;padding:9px 15px;cursor:pointer}[hidden]{display:none!important}@media(max-width:900px){#pages{grid-template-columns:1fr}#extras{grid-template-columns:repeat(2,1fr)}header,main{padding:16px}img{height:540px}}@media(max-width:500px){#extras{grid-template-columns:1fr}.head{display:block}input{width:100%}}</style>
+<header><h1>momoのfish · 模拟器验收截图</h1><p>76个运行页面／状态各保留一张原始模拟器截图，另附9张交互与大字号状态。点击图片查看完整分辨率。M01是组件母版，在业务页面交叉核对。</p><p>本页用于用户验收，截图齐全不等于所有页面已获验收。书目、音频和视频为受控样例；S12的逐项未匹配明细仍有能力差异。发现页标题同行、书架居中、播放器单一播放按钮以用户后续要求为准。</p><p><a href="README.md">本轮修改、断言与限制</a> · <a href="audit.md">逐页索引</a> · <a href="../../../output/uiux-v3/gallery.html">全部设计原图</a></p></header>
+<nav><input id="search" placeholder="搜索编号或页面，例如 P21、书架" aria-label="搜索页面"><button id="player">播放器状态</button><button id="all">查看全部</button><span id="count">76页＋9补充</span></nav><main><h2>本轮重点状态</h2><section id="extras">EXTRAS</section><section id="pages">CARDS</section></main>
+<script>const search=document.querySelector('#search');const nodes=[...document.querySelectorAll('[data-search]')];function filter(q){q=q.trim().toLowerCase();nodes.forEach(n=>n.hidden=!n.dataset.search.toLowerCase().includes(q));document.querySelector('#count').textContent=nodes.filter(n=>!n.hidden).length+'项'}search.addEventListener('input',()=>filter(search.value));document.querySelector('#player').onclick=()=>{search.value='P21';filter('P21');document.querySelector('#extras').scrollIntoView()};document.querySelector('#all').onclick=()=>{search.value='';filter('')};if(location.hash){document.querySelector(location.hash)?.scrollIntoView()}</script></html>'''
+(out / 'index.html').write_text(page.replace('EXTRAS', extra_html).replace('CARDS', '\n'.join(cards)))
+lines = ['# 模拟器逐页验收索引', '', '[打开设计与模拟器并排图库](index.html) · [修改与验证记录](README.md)', '', '|编号|页面|模拟器截图|本轮说明|', '|---|---|---|---|']
+for row in rows:
+    if row['id'] == 'M01':
+        lines.append('|M01|统一组件母版|业务页面交叉核对|不是独立运行页面|')
+    else:
+        lines.append(f'|{row["id"]}|{row["name"]}|[原图]({row["screenshot"]})|{row["note"]}|')
+(out / 'audit.md').write_text('\n'.join(lines) + '\n')
+print(f'已导出{len(rows)-1}个页面／状态、{len(extras)}张补充截图。')
