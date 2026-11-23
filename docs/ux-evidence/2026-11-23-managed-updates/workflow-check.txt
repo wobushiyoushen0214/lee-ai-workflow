@@ -1,5 +1,6 @@
 命令：python3 scripts/check-workflow.py --strict --commits 0 --config <临时配置>
-配置：在原 workflow.config.json 的 link_docs 加入 README.md，其余保持不变；临时文件已清理。
+配置：原配置的 link_docs 加入根 README；临时配置已清理。
+范围：新增 GitHub 核对记录和完成状态的结构/链接；代码未变，复用 54 项回归与 GitHub 行为核对。
 == 工作流自检 ==
 FAIL 0 · WARN 0
 全部通过，没有发现问题。

@@ -1,0 +1,17 @@
+{
+  "repository": "https://github.com/wobushiyoushen0214/lee-ai-workflow",
+  "public": true,
+  "default_branch": "main",
+  "tested_revision": "e7ad1345fdc68d9657198006ce59bae1be26e9bc",
+  "version": "1.4.0",
+  "assertions": [
+    "远端 main 与本地一致",
+    "首次 install 保留原有 AGENTS 字节",
+    "update 预览未写项目",
+    "同版本 update --apply 不改安装记录",
+    "项目命令、配置、块外规则与业务文件逐字节保留",
+    "已安装命令实际从 GitHub 获取并更新",
+    "临时项目严格结构检查通过"
+  ],
+  "temporary_project_removed": true
+}
