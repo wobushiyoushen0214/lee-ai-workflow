@@ -1,0 +1,12 @@
+{
+  "name": "lee-ai-workflow",
+  "version": "1.5.0",
+  "commit": "f2c51b4444c4ced90760856b67d8c4f40b64055f",
+  "asset": "lee-ai-workflow-1.5.0.zip",
+  "bytes": 868674,
+  "sha256": "a85c58cb47c08d0b1383ee4d49eadaade13b07e8c5a7db879649ba8a4af684cb",
+  "archiveFiles": 205,
+  "requiredEntriesPresent": true,
+  "excludedRuntimeState": true,
+  "workflowCheck": "FAIL 0 · WARN 0"
+}

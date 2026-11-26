@@ -1,0 +1,58 @@
+[
+  {
+    "project": "wisdomcity-app",
+    "fromVersion": "1.4.0",
+    "version": "1.5.0",
+    "revision": "f2c51b4444c4ced90760856b67d8c4f40b64055f",
+    "managedFilesMatch": true,
+    "projectAdaptationPreserved": true,
+    "customAgentsSectionsPreserved": true,
+    "preexistingUnmanagedDirtyFilesPreserved": true,
+    "checkExitCode": 1,
+    "checkSummary": "FAIL 0 · WARN 94",
+    "preexistingCheckSummary": "FAIL 0 · WARN 94",
+    "newWarnings": false
+  },
+  {
+    "project": "dsh-fxxk",
+    "fromVersion": "1.4.0",
+    "version": "1.5.0",
+    "revision": "f2c51b4444c4ced90760856b67d8c4f40b64055f",
+    "managedFilesMatch": true,
+    "projectAdaptationPreserved": true,
+    "customAgentsSectionsPreserved": true,
+    "preexistingUnmanagedDirtyFilesPreserved": true,
+    "checkExitCode": 0,
+    "checkSummary": "FAIL 0 · WARN 0",
+    "preexistingCheckSummary": "FAIL 0 · WARN 0",
+    "newWarnings": false
+  },
+  {
+    "project": "momofish-android",
+    "fromVersion": "1.4.0",
+    "version": "1.5.0",
+    "revision": "f2c51b4444c4ced90760856b67d8c4f40b64055f",
+    "managedFilesMatch": true,
+    "projectAdaptationPreserved": true,
+    "customAgentsSectionsPreserved": true,
+    "preexistingUnmanagedDirtyFilesPreserved": true,
+    "checkExitCode": 1,
+    "checkSummary": "FAIL 0 · WARN 7",
+    "preexistingCheckSummary": "FAIL 0 · WARN 7",
+    "newWarnings": false
+  },
+  {
+    "project": "momofish-flutter",
+    "fromVersion": "1.4.0",
+    "version": "1.5.0",
+    "revision": "f2c51b4444c4ced90760856b67d8c4f40b64055f",
+    "managedFilesMatch": true,
+    "projectAdaptationPreserved": true,
+    "customAgentsSectionsPreserved": true,
+    "preexistingUnmanagedDirtyFilesPreserved": true,
+    "checkExitCode": 0,
+    "checkSummary": "FAIL 0 · WARN 0",
+    "preexistingCheckSummary": "FAIL 0 · WARN 0",
+    "newWarnings": false
+  }
+]

@@ -1,0 +1,20 @@
+Source: f2c51b4444c4ced90760856b67d8c4f40b64055f
+Command: git archive --format=zip --prefix=lee-ai-workflow-1.5.0/ -o lee-ai-workflow-1.5.0.zip f2c51b4444c4ced90760856b67d8c4f40b64055f
+{
+  "name": "lee-ai-workflow",
+  "version": "1.5.0",
+  "commit": "f2c51b4444c4ced90760856b67d8c4f40b64055f",
+  "asset": "lee-ai-workflow-1.5.0.zip",
+  "bytes": 868674,
+  "sha256": "a85c58cb47c08d0b1383ee4d49eadaade13b07e8c5a7db879649ba8a4af684cb",
+  "archiveFiles": 205,
+  "requiredEntriesPresent": true,
+  "excludedRuntimeState": true,
+  "workflowCheck": "FAIL 0 · WARN 0"
+}
+Archive extraction check:
+== 工作流自检 ==
+FAIL 0 · WARN 0
+全部通过，没有发现问题。
+
+Reused verified results from source commit: 55 workflow tests and 40 canvas tests.
