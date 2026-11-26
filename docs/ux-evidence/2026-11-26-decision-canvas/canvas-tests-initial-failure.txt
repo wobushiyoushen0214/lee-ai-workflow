@@ -1,0 +1,261 @@
+
+> decision-canvas@0.1.0 test
+> node --test test/*.test.js
+
+TAP version 13
+# Subtest: 自定义 lee-ai-workflow 路径与 report.md 证据入口，提案保存到配置目录
+ok 1 - 自定义 lee-ai-workflow 路径与 report.md 证据入口，提案保存到配置目录
+  ---
+  duration_ms: 52.802292
+  type: 'test'
+  ...
+# Subtest: 两个独立文件适配器并发保存只允许一个成功
+ok 2 - 两个独立文件适配器并发保存只允许一个成功
+  ---
+  duration_ms: 27.420041
+  type: 'test'
+  ...
+# Subtest: 配置拒绝越界目录和外部符号链接
+ok 3 - 配置拒绝越界目录和外部符号链接
+  ---
+  duration_ms: 2.1765
+  type: 'test'
+  ...
+# Subtest: 冻结来源、版本回填、提案引用转换与并发重复保存
+ok 4 - 冻结来源、版本回填、提案引用转换与并发重复保存
+  ---
+  duration_ms: 50.798292
+  type: 'test'
+  ...
+# Subtest: 来源变化、未知引用和取消后的回填都被拒绝
+ok 5 - 来源变化、未知引用和取消后的回填都被拒绝
+  ---
+  duration_ms: 21.522
+  type: 'test'
+  ...
+# Subtest: 分析在另一个服务进程重开后仍可完成，重复 ID 不混用问题
+ok 6 - 分析在另一个服务进程重开后仍可完成，重复 ID 不混用问题
+  ---
+  duration_ms: 16.570917
+  type: 'test'
+  ...
+# Subtest: 通用 Agent 版本继续读取和完成早期 Codex 分析记录
+ok 7 - 通用 Agent 版本继续读取和完成早期 Codex 分析记录
+  ---
+  duration_ms: 11.517917
+  type: 'test'
+  ...
+# Subtest: HTTP 页面可加载，接口要求令牌并拒绝跨站和任意路径
+ok 8 - HTTP 页面可加载，接口要求令牌并拒绝跨站和任意路径
+  ---
+  duration_ms: 21.008042
+  type: 'test'
+  ...
+# Subtest: 打包 MCP 实际握手、工具发现、工作区检索和右侧页面 URL
+ok 9 - 打包 MCP 实际握手、工具发现、工作区检索和右侧页面 URL
+  ---
+  duration_ms: 2118.260833
+  type: 'test'
+  ...
+# Subtest: 并发 CAS 只允许一方保存，另一方失败且不覆盖
+ok 10 - 并发 CAS 只允许一方保存，另一方失败且不覆盖
+  ---
+  duration_ms: 39.686833
+  type: 'test'
+  ...
+# Subtest: 拒绝损坏画布、未知版本、无穷坐标与循环映射
+ok 11 - 拒绝损坏画布、未知版本、无穷坐标与循环映射
+  ---
+  duration_ms: 0.35825
+  type: 'test'
+  ...
+# Subtest: 确认改名后人工关系和坐标投影到新节点；导出过滤无效端点
+ok 12 - 确认改名后人工关系和坐标投影到新节点；导出过滤无效端点
+  ---
+  duration_ms: 0.521541
+  type: 'test'
+  ...
+# Subtest: Host 与 Agent 工具操作同一状态，生命周期移动不丢布局
+ok 13 - Host 与 Agent 工具操作同一状态，生命周期移动不丢布局
+  ---
+  duration_ms: 22.153709
+  type: 'test'
+  ...
+# Subtest: 慢扫描期间轮询复用请求，不会让成功响应持续过期；新世代独立读取
+ok 14 - 慢扫描期间轮询复用请求，不会让成功响应持续过期；新世代独立读取
+  ---
+  duration_ms: 0.508
+  type: 'test'
+  ...
+# Subtest: 失败的扫描释放请求，允许手动重试
+ok 15 - 失败的扫描释放请求，允许手动重试
+  ---
+  duration_ms: 1.248042
+  type: 'test'
+  ...
+# Subtest: 手动刷新等待旧轮询结束后读取新状态，不复用修改之前的图
+ok 16 - 手动刷新等待旧轮询结束后读取新状态，不复用修改之前的图
+  ---
+  duration_ms: 0.102916
+  type: 'test'
+  ...
+# Subtest: 组合筛选只保留可见端点，关联聚焦保留选中记录与一跳邻居
+ok 17 - 组合筛选只保留可见端点，关联聚焦保留选中记录与一跳邻居
+  ---
+  duration_ms: 0.990125
+  type: 'test'
+  ...
+# Subtest: 时间列表按提出日期倒序分组，保留同日记录和无日期文档且不改原数组
+ok 18 - 时间列表按提出日期倒序分组，保留同日记录和无日期文档且不改原数组
+  ---
+  duration_ms: 7.544833
+  type: 'test'
+  ...
+# Subtest: 悬停同时强调直接入边、出边及相关卡片，不沿环或相邻卡片之间继续扩散
+ok 19 - 悬停同时强调直接入边、出边及相关卡片，不沿环或相邻卡片之间继续扩散
+  ---
+  duration_ms: 0.185292
+  type: 'test'
+  ...
+# Subtest: 悬停临时覆盖多选强调，移开后恢复多选且不改输入或选中项
+ok 20 - 悬停临时覆盖多选强调，移开后恢复多选且不改输入或选中项
+  ---
+  duration_ms: 0.6845
+  type: 'test'
+  ...
+# Subtest: 孤立卡片仍可悬停聚焦；筛选移除的节点与失效边不参与强调
+ok 21 - 孤立卡片仍可悬停聚焦；筛选移除的节点与失效边不参与强调
+  ---
+  duration_ms: 0.083709
+  type: 'test'
+  ...
+# Subtest: 有环、孤立节点和同层节点的完整布局稳定且无重叠，输入顺序不影响布局
+ok 22 - 有环、孤立节点和同层节点的完整布局稳定且无重叠，输入顺序不影响布局
+  ---
+  duration_ms: 11.153125
+  type: 'test'
+  ...
+# Subtest: 旧尺寸布局相交与新增卡片混用自动坐标时，仅移动冲突卡片
+ok 23 - 旧尺寸布局相交与新增卡片混用自动坐标时，仅移动冲突卡片
+  ---
+  duration_ms: 0.467
+  type: 'test'
+  ...
+# Subtest: 固定节点作为障碍保持精确坐标，自动整理与新增卡片绕开固定位置
+ok 24 - 固定节点作为障碍保持精确坐标，自动整理与新增卡片绕开固定位置
+  ---
+  duration_ms: 0.095667
+  type: 'test'
+  ...
+# Subtest: 已有固定位置互相覆盖时报告冲突，其他卡片仍然避让，解除固定可修复
+ok 25 - 已有固定位置互相覆盖时报告冲突，其他卡片仍然避让，解除固定可修复
+  ---
+  duration_ms: 0.125292
+  type: 'test'
+  ...
+# Subtest: 拖动结束优先保留拖动卡片，其他未固定卡片避让；拖向固定节点时避开固定节点
+ok 26 - 拖动结束优先保留拖动卡片，其他未固定卡片避让；拖向固定节点时避开固定节点
+  ---
+  duration_ms: 0.082834
+  type: 'test'
+  ...
+# Subtest: 筛选只投影完整布局，隐藏的节点保留位置，新增记录不挤占旧位置
+ok 27 - 筛选只投影完整布局，隐藏的节点保留位置，新增记录不挤占旧位置
+  ---
+  duration_ms: 0.617083
+  type: 'test'
+  ...
+# Subtest: 500 张遗留卡片共用坐标时仍全部避让且结果确定，无迭代次数上限导致的残留重叠
+ok 28 - 500 张遗留卡片共用坐标时仍全部避让且结果确定，无迭代次数上限导致的残留重叠
+  ---
+  duration_ms: 46.402458
+  type: 'test'
+  ...
+# Subtest: 双向原文引用只展示一条双向边，保留两端来源、独立人工关系与 hover 强调
+ok 29 - 双向原文引用只展示一条双向边，保留两端来源、独立人工关系与 hover 强调
+  ---
+  duration_ms: 0.399542
+  type: 'test'
+  ...
+# Subtest: 逆向、同列及横向连线使用面对面端口，拖动后重新计算方向
+ok 30 - 逆向、同列及横向连线使用面对面端口，拖动后重新计算方向
+  ---
+  duration_ms: 0.310542
+  type: 'test'
+  ...
+# Subtest: AST 支持引用式链接、中文路径与锚点，跳过代码中的假链接
+ok 31 - AST 支持引用式链接、中文路径与锚点，跳过代码中的假链接
+  ---
+  duration_ms: 7.756084
+  type: 'test'
+  ...
+# Subtest: 归档状态组合合法；缺失状态、未知分类和缺失备选方案有诊断
+ok 32 - 归档状态组合合法；缺失状态、未知分类和缺失备选方案有诊断
+  ---
+  duration_ms: 2.087
+  type: 'test'
+  ...
+# Subtest: 图保留环、去重引用来源、缺失节点、独立记录与重复身份
+ok 33 - 图保留环、去重引用来源、缺失节点、独立记录与重复身份
+  ---
+  duration_ms: 19.401875
+  type: 'test'
+  ...
+# Subtest: 工作区读取拒绝上级路径和逃逸符号链接
+ok 34 - 工作区读取拒绝上级路径和逃逸符号链接
+  ---
+  duration_ms: 1.327208
+  type: 'test'
+  ...
+# Subtest: 提案必须有完整骨架且只能为 proposed
+ok 35 - 提案必须有完整骨架且只能为 proposed
+  ---
+  duration_ms: 1.459875
+  type: 'test'
+  ...
+# Subtest: 同项目的两个聊天和独立服务不共享引用，清空仅影响当前上下文
+ok 36 - 同项目的两个聊天和独立服务不共享引用，清空仅影响当前上下文
+  ---
+  duration_ms: 39.57075
+  type: 'test'
+  ...
+# Subtest: 引用读取最新来源，删除后显式返回缺失，不扩大检索范围
+ok 37 - 引用读取最新来源，删除后显式返回缺失，不扩大检索范围
+  ---
+  duration_ms: 16.957125
+  type: 'test'
+  ...
+# Subtest: 页面切换项目后引用返回真实项目，其他上下文保持原项目
+ok 38 - 页面切换项目后引用返回真实项目，其他上下文保持原项目
+  ---
+  duration_ms: 12.873041
+  type: 'test'
+  ...
+# Subtest: 打包 CLI 在无依赖目录启动页面，request 与浏览器共享引用
+not ok 39 - 打包 CLI 在无依赖目录启动页面，request 与浏览器共享引用
+  ---
+  duration_ms: 5098.339417
+  type: 'test'
+  location: '/Users/lizhiwei/localProj/momofish-android-workflow/plugins/decision-canvas/test/session-references.test.js:57:1'
+  failureType: 'testCodeFailure'
+  error: |-
+    Command failed: /Users/lizhiwei/.nvm/versions/node/v22.23.4/bin/node /Users/lizhiwei/localProj/momofish-android-workflow/plugins/decision-canvas/dist/cli.mjs request http://127.0.0.1:49583/?workspace=workspace-f02825b8b6fa34ca823d3dc8&context=fd012f0f-4eb6-434c-b2d3-b3257ccba963#token=[redacted] references
+
+  code: 'ERR_TEST_FAILURE'
+  stack: |-
+    genericNodeError (node:internal/errors:983:15)
+    wrappedFn (node:internal/errors:537:14)
+    ChildProcess.exithandler (node:child_process:417:12)
+    ChildProcess.emit (node:events:519:28)
+    maybeClose (node:internal/child_process:1101:16)
+    ChildProcess._handle.onexit (node:internal/child_process:304:5)
+  ...
+1..39
+# tests 39
+# suites 0
+# pass 38
+# fail 1
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 5280.678292

@@ -70,6 +70,18 @@ class PortableWorkflowTest(unittest.TestCase):
         self.assertTrue(path.read_text().startswith(original + "\n\n"))
         self.assertEqual(self.installer.plan(self.target, self.source)[1], [])
 
+    def test_canvas_guide_is_managed_but_plugin_is_not_copied_or_executed(self):
+        with mock.patch.object(self.installer.subprocess, "run", side_effect=AssertionError("安装不能运行外部工具")):
+            self.install()
+        state = json.loads((self.target / self.installer.STATE).read_text())
+        self.assertIn("docs/distribution.md", state["files"])
+        self.assertTrue((self.target / "docs/distribution.md").is_file())
+        self.assertFalse((self.target / "plugins").exists())
+        self.assertFalse((self.target / "node_modules").exists())
+        self.assertFalse((self.target / ".codex").exists())
+        self.assertFalse((self.target / ".agents/plugins").exists())
+        self.assertFalse((self.target / ".agents/skills/decision-canvas").exists())
+
     def test_different_file_conflict_writes_nothing(self):
         path = self.target / "docs/workflow.md"
         path.parent.mkdir()

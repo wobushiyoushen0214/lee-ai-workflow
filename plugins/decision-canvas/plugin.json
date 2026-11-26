@@ -1,0 +1,30 @@
+{
+  "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
+  "name": "decision-canvas",
+  "version": "0.1.0",
+  "description": "Browse Markdown decisions and analyze their history with the current agent. Compatible with lee-ai-workflow.",
+  "license": "MIT",
+  "keywords": [
+    "decisions",
+    "canvas",
+    "mcp",
+    "lee-ai-workflow"
+  ],
+  "extensions": {
+    "com.openai": {
+      "interface": {
+        "displayName": "决策画布",
+        "shortDescription": "查看历史取舍，沿引用回溯，在当前 Agent 中分析与保存提案",
+        "category": "Productivity",
+        "capabilities": [
+          "Read",
+          "Write"
+        ],
+        "defaultPrompt": [
+          "打开当前项目的决策画布",
+          "根据历史决定比较这次的可行方案"
+        ]
+      }
+    }
+  }
+}

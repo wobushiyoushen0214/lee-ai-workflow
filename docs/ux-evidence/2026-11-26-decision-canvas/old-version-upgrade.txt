@@ -1,0 +1,84 @@
+$ python3 /var/folders/yl/rvbzwc5x0sd_f5h3j98b_np00000gn/T/decision-workflow-upgrade-_ty9r5d7/old/scripts/lee-workflow.py install /var/folders/yl/rvbzwc5x0sd_f5h3j98b_np00000gn/T/decision-workflow-upgrade-_ty9r5d7/project --apply
+实际接入： /private/var/folders/yl/rvbzwc5x0sd_f5h3j98b_np00000gn/T/decision-workflow-upgrade-_ty9r5d7/project
+新增：docs/ai-workflow.md
+新增：docs/distribution.md
+新增：docs/workflow.md
+新增：workflow.config.json
+新增：workflow-package.json
+新增：scripts/check-workflow.py
+新增：scripts/test_check_workflow.py
+新增：scripts/test_portable_workflow.py
+新增：scripts/test_update_workflow.py
+新增：scripts/install-workflow.py
+新增：scripts/lee-workflow.py
+新增：templates/AGENTS-entry.txt
+新增：templates/README.md
+新增：templates/acceptance.txt
+新增：templates/blocked.txt
+新增：templates/commit-message.txt
+新增：templates/delivery.txt
+新增：templates/design-alignment.md
+新增：templates/evidence-full.md
+新增：templates/evidence-small.md
+新增：templates/handoff.txt
+新增：templates/note-archived.md
+新增：templates/note-implemented.md
+新增：templates/note-proposed.md
+新增：templates/note-rejected.md
+新增：templates/postmortem.md
+新增：templates/release.md
+新增：templates/task-card.txt
+新增：.agents/skills/write-notes-like-deepseek/.gitignore
+新增：.agents/skills/write-notes-like-deepseek/README.md
+新增：.agents/skills/write-notes-like-deepseek/SKILL.md
+新增：.agents/skills/write-notes-like-deepseek/package.json
+新增：.agents/skills/write-notes-like-deepseek/references/archiving.md
+新增：.agents/skills/write-notes-like-deepseek/references/classification.md
+新增：.agents/skills/write-notes-like-deepseek/references/note-format.md
+新增：.agents/skills/write-notes-like-deepseek/references/prose-checklist.md
+新增：.agents/skills/write-notes-like-deepseek/references/simplification-checklist.md
+新增：.agents/skills/write-notes-like-deepseek/references/verification.md
+新增：.agents/skills/write-notes-like-deepseek/references/when-to-write.md
+新增：.agents/skills/write-notes-like-deepseek/scripts/agent-note-tree.ts
+新增：.agents/skills/write-notes-like-deepseek/scripts/verify-agent-note-format.ts
+新增：.agents/skills/write-notes-like-deepseek/scripts/verify-agent-note-tree.ts
+新增：.agents/skills/write-notes-like-deepseek/templates/implemented.md
+新增：.agents/skills/write-notes-like-deepseek/templates/proposed.md
+新增：.agents/skills/write-notes-like-deepseek/templates/rejected.md
+新增：reference/README.md
+新增：reference/momofish-android/.agents/notes/implemented/process/2026-11-04-workflow-consistency.md.txt
+新增：reference/momofish-android/AGENTS.md.txt
+新增：reference/momofish-android/docs/ai-workflow.md.txt
+新增：reference/momofish-android/docs/workflow.md.txt
+新增：reference/momofish-android/scripts/build-emulator-acceptance.py.txt
+新增：reference/momofish-android/scripts/check-workflow.py.txt
+新增：reference/momofish-android/scripts/run-ui-audit.py.txt
+新增：reference/momofish-android/scripts/test_check_workflow.py.txt
+新增：reference/source-manifest.json
+新增：AGENTS.md
+新增：.agents/notes/.gitkeep
+新增：docs/ux-evidence/.gitkeep
+新增：docs/releases/.gitkeep
+新增：.agents/workflow/installation.json
+已处理 60 项。
+
+$ python3 /var/folders/yl/rvbzwc5x0sd_f5h3j98b_np00000gn/T/decision-workflow-upgrade-_ty9r5d7/project/scripts/lee-workflow.py update --source /Users/lizhiwei/localProj/momofish-android-workflow --apply
+实际升级： /private/var/folders/yl/rvbzwc5x0sd_f5h3j98b_np00000gn/T/decision-workflow-upgrade-_ty9r5d7/project
+更新：docs/ai-workflow.md
+更新：docs/distribution.md
+更新：scripts/test_portable_workflow.py
+更新：templates/AGENTS-entry.txt
+更新：templates/README.md
+新增：templates/install-choice.txt
+更新：workflow-package.json
+更新：AGENTS.md
+更新：.agents/workflow/installation.json
+保留项目内容：docs/workflow.md、workflow.config.json
+已处理 9 项。
+
+$ python3 /var/folders/yl/rvbzwc5x0sd_f5h3j98b_np00000gn/T/decision-workflow-upgrade-_ty9r5d7/project/scripts/check-workflow.py --root /var/folders/yl/rvbzwc5x0sd_f5h3j98b_np00000gn/T/decision-workflow-upgrade-_ty9r5d7/project --strict --commits 0
+== 工作流自检 ==
+FAIL 0 · WARN 0
+全部通过，没有发现问题。
+
+PASS: original 1.4.0 updater installs 1.5.0 guide, entry and interactive-choice instructions; no plugin or Node dependencies copied.

@@ -1,0 +1,4 @@
+interface:
+  display_name: "决策画布"
+  short_description: "快速打开项目决策画布，引用历史记录到当前会话并回溯关键取舍"
+  default_prompt: "使用 $decision-canvas 打开当前项目的决策画布。"

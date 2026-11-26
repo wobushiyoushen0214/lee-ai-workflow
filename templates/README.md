@@ -13,6 +13,7 @@
 - [evidence-full.md](evidence-full.md)
 - [evidence-small.md](evidence-small.md)
 - [handoff.txt](handoff.txt)
+- [install-choice.txt](install-choice.txt)：AI 首次安装时选择是否同时启用决策画布
 - [note-archived.md](note-archived.md)
 - [note-implemented.md](note-implemented.md)
 - [note-proposed.md](note-proposed.md)

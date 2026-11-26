@@ -9,8 +9,10 @@
 
 - 用户当前指令及会话中已有授权优先；普通实现选择在授权范围内自主推进。询问边界统一见手册 §4.4；重要决定先记方案，缺独立设计稿时按 §5.3 沿用现有规范，不因此再次确认。
 - 重要行为、架构、契约、流程、落盘格式或选型决定执行 [write-notes-like-deepseek](.agents/skills/write-notes-like-deepseek/SKILL.md)：先写 proposed，完成后改 implemented，否决写 rejected；每篇必含 `## Alternatives considered`。
+- 可选[决策画布](docs/distribution.md#决策画布可选)用于按需浏览和回顾历史取舍；用户要求打开时在右侧浏览器展示。日常任务不自动打开或发起分析，未安装时继续原有 Markdown 工作流。
 - Note 路径：`.agents/notes/{proposed,implemented,rejected,archived}/{feature,bug-fix,simplification,architecture,process,testing}/YYYY-MM-DD-<kebab-topic>.md`。归档保留 `Status: implemented` 并加 `Archived: YYYY-MM-DD`。
 - 仅格式、无歧义重命名、错别字标 `not applicable`；常规可逆修复没有重要取舍时不写独立 Note。行为、契约、数据流、路由、状态机或测试文件改动仍跑相关测试。
+- 界面设计：Avoid unnecessary secondary labels and descriptions. Let the layout do the explaining. 优先用布局、层级和控件表达含义，避免不必要的次级标签、重复标题与解释性文案；保留必要的操作名称、错误反馈和无障碍标签。
 - 纯 UI 微调按适配表做格式/静态检查与同批修改完成后的最终一次画面核对，不跑行为测试；截图用于视觉疑点、差异比较或明确要求，额外状态按风险选择。
 - 验证按验收问题选择手段；满足手册 §8.4 的停止条件就收尾。结果仍有效时复用；相关新改动、失败、环境变化或明确要求才定向重验。不写、不跑没有断言价值的冒烟测试，不用「没崩」或「编译过」冒充行为正确。
 - 日常证据默认精简 README；没有独立输出的小任务可记在回复或已有 Note。决策与原始输出各保留一处，其他位置引用；记录受检范围、相关环境与复跑命令。失败记录保留并标明不计通过；临时状态恢复后补受影响核对。

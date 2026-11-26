@@ -1,0 +1,5 @@
+
+> decision-canvas@0.1.0 check
+> node tools/check.mjs
+
+Source syntax, build outputs and plugin entry points checked.

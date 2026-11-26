@@ -1,0 +1,1 @@
+Original dsh-decision-canvas: 52 baseline file hashes unchanged; git worktree clean.

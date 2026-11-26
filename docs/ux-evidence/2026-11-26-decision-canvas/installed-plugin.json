@@ -1,0 +1,17 @@
+{
+  "pluginId": "decision-canvas@lee-ai-workflow-local",
+  "version": "0.1.0",
+  "tool": "decision_canvas",
+  "mcpHandshake": true,
+  "httpStatus": 200,
+  "browserSelectionReadableViaMcp": true,
+  "referenceCount": 1,
+  "sourceCacheMatch": [
+    "dist/app.js",
+    "dist/app.css",
+    "dist/mcp.mjs",
+    "dist/cli.mjs",
+    "skills/decision-canvas/SKILL.md"
+  ],
+  "cliSha256": "dce00726c61f1176dacdb00e6a683e3393a57186740d2b1027fd058ce1aa14fc"
+}

@@ -2,11 +2,13 @@
 
 一套按风险选择流程、按验收问题选择验证的 AI 开发工作流。包含执行手册、AGENTS 入口、项目内决策留痕、模板、配置、自检和 install/update。源自 momofish-android，保留[原版参考](reference/README.md)。
 
-当前版本 **1.4.0**。上游：[wobushiyoushen0214/lee-ai-workflow](https://github.com/wobushiyoushen0214/lee-ai-workflow)。工作流与留痕规则随项目携带，无需安装全局 Codex 技能。前一版减少重复截图、验证和文档的六项理由见[决策记录](.agents/notes/implemented/process/2026-11-23-risk-based-workflow.md)。
+当前版本 **1.5.0**。上游：[wobushiyoushen0214/lee-ai-workflow](https://github.com/wobushiyoushen0214/lee-ai-workflow)。工作流与留痕规则随项目携带，无需安装全局 Codex 技能。前一版减少重复截图、验证和文档的六项理由见[决策记录](.agents/notes/implemented/process/2026-11-23-risk-based-workflow.md)。
 
 ## 把仓库地址交给 AI
 
-在目标项目的 Codex 聊天中直接说：
+AI 首次安装且用户尚未选择可选组件时，先按[安装选择](templates/install-choice.txt)展示交互选择框：「仅安装工作流」或「工作流 + 决策画布」。已有明确选择就直接执行；普通 update 不重复询问。等待选择时可继续基础安装，没有回答不启用插件。
+
+在目标项目的 AI 会话中直接说：
 
 ```text
 请按 https://github.com/wobushiyoushen0214/lee-ai-workflow 的 README，
@@ -68,6 +70,10 @@ python3 scripts/lee-workflow.py update --apply
 默认获取上游 main。更新保留 `docs/workflow.md`、`workflow.config.json`、AGENTS 块外约定和项目 Note/证据；只有上游改动的受管理文件才替换。本地和上游同时修改同一流程文件或入口块时整批不写，列出冲突供合并。可指定版本或离线源目录，详见[安装与升级](docs/distribution.md)。
 
 此前手工复制的旧版没有安装基线，先由 AI 核对合并流程文件，再用 `install --adopt --apply` 登记；该命令仍拒绝接管与上游不同的通用规则，只允许保留项目适配文件。
+
+## 决策画布（可选）
+
+通过标准 MCP 浏览项目的决定、关系、原文与证据（Codex 支持右侧展示），并在当前对话分析历史。画布展示和本地刷新不调用模型。使用与一次安装见 [决策画布](docs/distribution.md#决策画布可选)，维护源码位于 `plugins/decision-canvas/`。普通工作流 install/update 只分发使用说明，不自动安装插件或增加 Node 依赖。
 
 ## 配置与异地自检
 

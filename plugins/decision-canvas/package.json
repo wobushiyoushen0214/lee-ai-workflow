@@ -1,0 +1,36 @@
+{
+  "name": "decision-canvas",
+  "version": "0.1.0",
+  "description": "决策画布：Markdown 历史、关系图与当前对话分析，兼容 lee-ai-workflow",
+  "private": true,
+  "type": "module",
+  "license": "MIT",
+  "engines": {
+    "node": ">=22.19.0"
+  },
+  "scripts": {
+    "start": "node cli.js serve",
+    "mcp": "node dist/mcp.mjs",
+    "build": "node tools/build.mjs",
+    "test": "node --test test/*.test.js",
+    "check": "node tools/check.mjs",
+    "package:plugin": "node tools/package-plugin.mjs",
+    "install:codex": "node tools/install-codex.mjs"
+  },
+  "dependencies": {
+    "@dagrejs/dagre": "3.1.3",
+    "@modelcontextprotocol/sdk": "1.32.2",
+    "@xyflow/react": "12.12.1",
+    "lucide-react": "1.70.0",
+    "react": "18.3.1",
+    "react-dom": "18.3.1",
+    "react-markdown": "10.1.0",
+    "remark-gfm": "4.0.1",
+    "remark-parse": "11.0.0",
+    "unified": "11.0.5",
+    "unist-util-visit": "5.2.0"
+  },
+  "devDependencies": {
+    "esbuild": "0.28.2"
+  }
+}
